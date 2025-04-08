@@ -4,7 +4,7 @@
 - Mehek Bhargava: msbharga@calpoly.edu
 - Yanitsa Ivanova: yivanova@calpoly.edu
 - Dhvani Goel: dhgoel@calpoly.edu
-- Jillian Bogosian – jbogosia@calpoly.edu
+- Jillian Bogosian: jbogosia@calpoly.edu
   
 The **Gym Membership System** is a database-backed application designed to help gyms efficiently manage members, trainers, classes, and workout plans. This project aims to streamline operations by keeping track of:
 
