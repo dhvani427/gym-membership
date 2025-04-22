@@ -1,120 +1,199 @@
-API Documentation
+# 🏋️ Gym Membership API Documentation
 
-/users/Register: create a new account (POST)
+## 📌 Endpoints
 
-Request: {
+---
+
+### **POST /users/Register**  
+Create a new user account.
+
+#### Request
+```json
+{
   "username": "string",
   "first_name": "string",
   "last_name": "string",
-  “email”: “string”,
-  “password”: “string”,
-  “membership_plan”: “string”,
+  "email": "string",
+  "password": "string",
+  "membership_plan": "string"
 }
+```
 
-Response: {
-“Success”: true,
+#### Response
+```json
+{
+  "success": true
 }
+```
 
-/users/{username} (GET)
+---
 
-Request: {}
+### **GET /users/{username}**  
+Get a user's profile by username.
 
-Response:  {
+#### Request
+```json
+{}
+```
+
+#### Response
+```json
+{
   "username": "string",
   "first_name": "string",
-  "last_names": "string",
-  “email”: “string”,
-  “membership_plan”: "string",
+  "last_name": "string",
+  "email": "string",
+  "membership_plan": "string"
 }
+```
 
-/classes/{date} (GET)
+---
 
-Request: 
+### **GET /classes/{date}**  
+Get a list of classes available on a specific date.
+
+#### Request
+```json
+{}
+```
+
+#### Response
+```json
 [
   {
-    "Class_id": "string",
-    “Class_name”: "string"
-    "Date": "YYYY-MM-DD",
-    "Instructor": "string",
-    "Duration": “integer”,
-    "Difficulty": “string”
+    "class_id": "string",
+    "class_name": "string",
+    "date": "YYYY-MM-DD",
+    "instructor": "string",
+    "duration": "integer",
+    "difficulty": "string"
   },
   {
-    "Class": "string",
-    "Date": "YYYY-MM-DD",
-    "Instructor": "string",
-    "Duration": “integer”,
-    "Difficulty": “string”
+    "class_id": "string",
+    "class_name": "string",
+    "date": "YYYY-MM-DD",
+    "instructor": "string",
+    "duration": "integer",
+    "difficulty": "string"
   }
 ]
+```
 
-/users/{username}/bookings (GET)
+---
 
-Request: {}
-Response: 
+### **GET /users/{username}/bookings**  
+View all classes booked by a specific user.
+
+#### Request
+```json
+{}
+```
+
+#### Response
+```json
 [
   {
-    "Class": "string",
-    "Date": "date",
-    "Instructor": "string",
-    "Duration": “int”,
-    "Difficulty": “string”
+    "class": "string",
+    "date": "YYYY-MM-DD",
+    "instructor": "string",
+    "duration": "integer",
+    "difficulty": "string"
   },
   {
-    "Class": "string",
-    "Date": "date",
-    "Instructor": "string",
-    "Duration": “int”,
-    "Difficulty": “string”
+    "class": "string",
+    "date": "YYYY-MM-DD",
+    "instructor": "string",
+    "duration": "integer",
+    "difficulty": "string"
   }
 ]
+```
 
-/membership-plans (GET)
+---
 
-Request: {}
-Response:
+### **GET /membership-plans**  
+List all available membership plans.
+
+#### Request
+```json
+{}
+```
+
+#### Response
+```json
 [
   {
-    "membership_id": int,
+    "membership_id": 1,
     "name": "string",
-    "price": int,
-    "duration_months": int
+    "price": 99,
+    "duration_months": 3
   },
   {
-    "membership_id": int,
+    "membership_id": 2,
     "name": "string",
-    "price": “integer”,
-    "duration_months": int
+    "price": 199,
+    "duration_months": 6
   }
 ]
+```
 
-/classes/{class_id}/enroll (POST)
+---
 
-Request: {
-  “username”: “string”
-}
-Response: {}
+### **POST /classes/{class_id}/enroll**  
+Enroll a user in a class.
 
-Add membership to cart
-/{cart_id}/carts/{membership_id} (PUT)
-
-Request:
+#### Request
+```json
 {
-	“Membership_id”: “int”
-	“Name” : “string”
-	“Cost”: “int”
+  "username": "string"
 }
-Response:
-{
-	“Success”: “boolean”
-}
+```
 
-{cart_id}/checkout (POST)
-	Request:
-	{
- 	"payment": "string",
-}
-Response:
+#### Response
+```json
 {
-	“Success”: “boolean”
+  "success": true
 }
+```
+
+---
+
+### **PUT /{cart_id}/carts/{membership_id}**  
+Add a membership to the cart.
+
+#### Request
+```json
+{
+  "membership_id": "integer",
+  "name": "string",
+  "cost": "integer"
+}
+```
+
+#### Response
+```json
+{
+  "success": true
+}
+```
+
+---
+
+### **POST /{cart_id}/checkout**  
+Checkout and make a payment.
+
+#### Request
+```json
+{
+  "payment": "string"
+}
+```
+
+#### Response
+```json
+{
+  "success": true
+}
+```
+
+---
