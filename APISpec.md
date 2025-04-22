@@ -63,7 +63,7 @@ Get a list of classes available on a specific date.
   {
     "class_id": "string",
     "class_name": "string",
-    "date": "YYYY-MM-DD",
+    "date": "date",
     "instructor": "string",
     "duration": "integer",
     "difficulty": "string"
@@ -71,7 +71,7 @@ Get a list of classes available on a specific date.
   {
     "class_id": "string",
     "class_name": "string",
-    "date": "YYYY-MM-DD",
+    "date": "date",
     "instructor": "string",
     "duration": "integer",
     "difficulty": "string"
@@ -94,14 +94,14 @@ View all classes booked by a specific user.
 [
   {
     "class": "string",
-    "date": "YYYY-MM-DD",
+    "date": "date",
     "instructor": "string",
     "duration": "integer",
     "difficulty": "string"
   },
   {
     "class": "string",
-    "date": "YYYY-MM-DD",
+    "date": "date",
     "instructor": "string",
     "duration": "integer",
     "difficulty": "string"
