@@ -22,7 +22,7 @@ Create a new user account.
 #### Response
 ```json
 {
-  "success": true
+  "success": "boolean"
 }
 ```
 
@@ -192,7 +192,7 @@ Checkout and make a payment.
 #### Response
 ```json
 {
-  "success": true
+  "success": "boolean"
 }
 ```
 
