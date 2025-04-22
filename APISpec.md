@@ -123,16 +123,16 @@ List all available membership plans.
 ```json
 [
   {
-    "membership_id": 1,
+    "membership_id": "integer",
     "name": "string",
-    "price": 99,
-    "duration_months": 3
+    "price": "integer",
+    "duration_months": "integer"
   },
   {
-    "membership_id": 2,
+    "membership_id": "integer",
     "name": "string",
-    "price": 199,
-    "duration_months": 6
+    "price": "integer",
+    "duration_months": "integer"
   }
 ]
 ```
@@ -152,7 +152,7 @@ Enroll a user in a class.
 #### Response
 ```json
 {
-  "success": true
+  "success": "boolean"
 }
 ```
 
@@ -173,7 +173,7 @@ Add a membership to the cart.
 #### Response
 ```json
 {
-  "success": true
+  "success": "boolean"
 }
 ```
 
