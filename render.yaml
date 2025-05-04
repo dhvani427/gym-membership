@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: central-coast-cauldrons
+    name: fithub-gym
     runtime: python
     plan: free
     autoDeploy: true
