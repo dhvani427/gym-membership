@@ -20,7 +20,6 @@ class User(BaseModel):
     email: str
 
 
-
 @router.post("/users/register", status_code=status.HTTP_204_NO_CONTENT)
 def register_user(user: User):
     """
@@ -64,3 +63,32 @@ def register_user(user: User):
 
             }
         )
+
+
+class UserResponse(BaseModel):
+    username: str
+    date_of_birth: date
+    first_name: str
+    last_name: str
+    email: str
+
+
+@router.get("/users/{username}", responsemodel=UserResponse)
+def get_user_info(username:str):
+    """
+    Get user details
+    """
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                # changed
+                """
+                SELECT * FROM users 
+                WHERE username = :username
+                """
+            ),{
+                "username": f"{username}",
+
+            }
+        )
+    return UserResponse(username=result.user, date_of_birth=result.date_of_birth, first_name=result.first_name, last_name=result.last_name, email=result.email)
