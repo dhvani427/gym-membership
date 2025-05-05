@@ -73,7 +73,7 @@ class UserResponse(BaseModel):
     email: str
 
 
-@router.get("/users/{username}", responsemodel=UserResponse)
+@router.get("/users/{username}", response_model=UserResponse)
 def get_user_info(username:str):
     """
     Get user details
