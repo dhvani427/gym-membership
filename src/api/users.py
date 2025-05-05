@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 import sqlalchemy
 from src.api import auth
 from src import database as db
@@ -10,7 +11,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-class User:
+class User(BaseModel):
     username: str
     password: str
     date_of_birth: date
@@ -37,7 +38,7 @@ def register_user(user: User):
             sqlalchemy.text(
                 "SELECT 1 FROM users WHERE username = :username"
             ),
-            {"tid": username}
+            {"username": username}
         ).first()
 
         if existing:
@@ -63,5 +64,3 @@ def register_user(user: User):
 
             }
         )
-    # TODO: Implement database write logic here
-    pass
