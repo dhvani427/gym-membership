@@ -17,7 +17,7 @@ class MembershipPlan(BaseModel):
     max_classes: int
 
 @router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
-def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
+def enroll_in_plan(membershipPlan: MembershipPlan):
     """
     Create new membership plan
     """
@@ -53,7 +53,7 @@ def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
             )
 
 class EnrollRequest(BaseModel):
-    membership_id: int
+    name: int
 
 class EnrollResponse(BaseModel):
     message: str
@@ -76,7 +76,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")
 
-        if user.membership_id is not None:
+        if user[7] is not None:
             raise HTTPException(
                 status_code=400,
                 detail="User already enrolled in a plan. Please upgrade if you want a different plan."
@@ -85,10 +85,10 @@ def enroll_in_plan(username: str, data: EnrollRequest):
         plan = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT * FROM membership WHERE membership_id = :membership_id
+                SELECT * FROM membership WHERE name = :name
                 """
             ),
-            {"membership_id": data.membership_id}
+            {"name": data.name}
         ).fetchone()
 
         if not plan:
@@ -98,11 +98,11 @@ def enroll_in_plan(username: str, data: EnrollRequest):
             sqlalchemy.text(
                 """
                 UPDATE users
-                SET membership = :membership_id
+                SET membership_plan = :membership_plan
                 WHERE username = :username
                 """
             ),
-            {"username": username, "membership_id": data.membership_id}
+            {"username": username, "membership_plan": data.name}
         )
     return EnrollResponse(message="User successfully enrolled in membership plan.")
 
