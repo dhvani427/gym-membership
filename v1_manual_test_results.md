@@ -55,3 +55,7 @@ GET /membership/membership/plans
     "max_classes": 30
   }
 ]
+
+POST /membership/membership/sophie123/enroll
+
+1. 
