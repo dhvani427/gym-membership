@@ -102,7 +102,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
                 WHERE username = :username
                 """
             ),
-            {"username": username, "membership_plan": data.name}
+            {"username": username, "membership_plan": plan[0]}
         )
     return EnrollResponse(message="User successfully enrolled in membership plan.")
 
