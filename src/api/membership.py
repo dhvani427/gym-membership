@@ -17,7 +17,7 @@ class MembershipPlan(BaseModel):
     max_classes: int
 
 @router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
-def enroll_in_plan(membershipPlan: MembershipPlan):
+def create_plan(membershipPlan: MembershipPlan):
     """
     Create new membership plan
     """
@@ -53,7 +53,7 @@ def enroll_in_plan(membershipPlan: MembershipPlan):
             )
 
 class EnrollRequest(BaseModel):
-    name: int
+    name: str
 
 class EnrollResponse(BaseModel):
     message: str
@@ -108,7 +108,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
 
 class MembershipResponse(BaseModel):
     membership_id: int
-    membership_plan: str
+    name: str
     cost: int
     max_classes: int
 
@@ -129,7 +129,7 @@ def get_membership_plans():
     return [
         MembershipResponse(
             membership_id=row[0],
-            membership_plan=row[1],
+            name=row[1],
             cost=row[2],
             max_classes=row[3]
         )
