@@ -16,7 +16,7 @@ class MembershipPlan(BaseModel):
     cost: int
     max_classes: int
 
-router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
 def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
     """
     Create new membership plan
