@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 class MembershipPlan(BaseModel):
-    membership_plan: str
+    name: str
     cost: int
     max_classes: int
 
@@ -26,10 +26,10 @@ def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
             sqlalchemy.text(
                 """
                 SELECT * FROM membership
-                WHERE membership_plan = :membership_plan
+                WHERE name = :membership_plan
                 """
                 ),
-            {"membership_plan": membershipPlan.membership_plan}
+            {"membership_plan": membershipPlan.name}
         ).fetchone()
 
         if result:
@@ -41,12 +41,12 @@ def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
             connection.execute(
                 sqlalchemy.text(
                     """
-                    INSERT INTO membership (membership_plan, cost, max_classes)
+                    INSERT INTO membership (name, cost, max_classes)
                     VALUES (:membership_plan, :cost, :max_classes)
                     """
                 ),
                 {
-                    "membership_plan": membershipPlan.membership_plan,
+                    "membership_plan": membershipPlan.name,
                     "cost": membershipPlan.cost,
                     "max_classes": membershipPlan.max_classes
                 }
