@@ -93,6 +93,7 @@ def get_user_info(username:str):
             }
         )
         user = result.fetchone()
+        print(user)
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
