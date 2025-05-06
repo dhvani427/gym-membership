@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel, Field
+
 import sqlalchemy
 from src.api import auth
 from src import database as db
@@ -91,4 +92,14 @@ def get_user_info(username:str):
 
             }
         )
-    return UserResponse(username=result.username, date_of_birth=result.date_of_birth, first_name=result.first_name, last_name=result.last_name, email=result.email)
+        user = result.fetchone()
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse(
+        username=user["username"],
+        date_of_birth=user["date_of_birth"],
+        first_name=user["first_name"],
+        last_name=user["last_name"],
+        email=user["email"]
+    )
