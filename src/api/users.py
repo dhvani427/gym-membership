@@ -92,7 +92,7 @@ def get_user_info(username:str):
 
             }
         )
-        user = result.fetchone()
+        user = result.mappings.fetchone()
         print(user)
 
     if user is None:
