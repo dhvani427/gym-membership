@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import List
 import sqlalchemy
@@ -12,10 +12,45 @@ router = APIRouter(
 )
 
 class MembershipPlan(BaseModel):
-    membership_id: int
     membership_plan: str
     cost: int
     max_classes: int
+
+router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
+def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
+    """
+    Create new membership plan
+    """
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT * FROM membership
+                WHERE membership_plan = :membership_plan
+                """
+                ),
+            {"membership_plan": membershipPlan.membership_plan}
+        ).fetchone()
+
+        if result:
+            raise HTTPException(
+                status_code=400,
+                detail="Plan already exists."
+            )
+        else:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO membership (membership_plan, cost, max_classes)
+                    VALUES (:membership_plan, :cost, :max_classes)
+                    """
+                ),
+                {
+                    "membership_plan": membershipPlan.membership_plan,
+                    "cost": membershipPlan.cost,
+                    "max_classes": membershipPlan.max_classes
+                }
+            )
 
 class EnrollRequest(BaseModel):
     membership_id: int
