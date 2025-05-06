@@ -98,9 +98,9 @@ def get_user_info(username:str):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return UserResponse(
-        username=user["username"],
-        date_of_birth=user["date_of_birth"],
-        first_name=user["first_name"],
-        last_name=user["last_name"],
-        email=user["email"]
+        username=user[1],
+        date_of_birth=user[5],
+        first_name=user[2],
+        last_name=user[3],
+        email=user[4]
     )
