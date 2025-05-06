@@ -91,4 +91,4 @@ def get_user_info(username:str):
 
             }
         )
-    return UserResponse(username=result.user, date_of_birth=result.date_of_birth, first_name=result.first_name, last_name=result.last_name, email=result.email)
+    return UserResponse(username=result.username, date_of_birth=result.date_of_birth, first_name=result.first_name, last_name=result.last_name, email=result.email)
