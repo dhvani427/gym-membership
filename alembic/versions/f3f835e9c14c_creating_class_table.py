@@ -34,8 +34,8 @@ def upgrade() -> None:
         sa.Column("description", sa.String, nullable=False),
         sa.Column("day", sa.Date, nullable=False),
         sa.Column("capacity", sa.Integer, nullable=False),
-        sa.Column("start_time", sa.String, nullable=False),
-        sa.Column("end_time", sa.String, nullable=False),
+        sa.Column("start_time", sa.Time, nullable=False),
+        sa.Column("end_time", sa.Time, nullable=False),
         sa.Column("instructor", sa.String, nullable=False),
         sa.Column("room_number", sa.Integer, sa.ForeignKey("rooms.room_number"), nullable=False),
     )
