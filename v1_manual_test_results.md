@@ -58,4 +58,15 @@ GET /membership/membership/plans
 
 POST /membership/membership/sophie123/enroll
 
-1. 
+1. curl -X 'POST' \
+  'https://fithub-gym-02nz.onrender.com/membership/membership/sophie123/enroll' \
+  -H 'accept: application/json' \
+  -H 'access_token: PushCodePullWeights' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "premium"
+}'
+
+2. {
+  "message": "User successfully enrolled in membership plan."
+}
