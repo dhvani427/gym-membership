@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api import users,membership
+from src.api import users, membership, classes
 from starlette.middleware.cors import CORSMiddleware
 
 description = """
@@ -33,6 +33,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(membership.router)
+app.include_router(classes.router)
 '''
 app.include_router(carts.router)
 app.include_router(catalog.router)
