@@ -31,7 +31,7 @@ def upgrade() -> None:
         "classes",
         sa.Column("class_id", sa.Integer, primary_key=True),
         sa.Column("class_name", sa.String, nullable=False),
-        sa.Column("type", sa.String, nullable=False),
+        sa.Column("class_type", sa.String, nullable=False),
         sa.Column("description", sa.String, nullable=False),
         sa.Column("day", sa.Date, nullable=False),
         sa.Column("capacity", sa.Integer, nullable=False),
@@ -46,5 +46,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table("rooms")
     op.drop_table("classes")
+    op.drop_table("rooms")
+    
