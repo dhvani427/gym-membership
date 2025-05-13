@@ -274,3 +274,151 @@ curl -X 'GET' \
 ]
 
 
+
+# Flow 5: Booking and Checking into a Class
+Jane wants to attend a fitness class tomorrow with her friends, so she starts by getting all available classes at the gym using GET /classes/. After seeing the options, she filters the classes for tomorrow using GET /classes/date/:date. Since she has dinner plans at 7 PM, she filters further by using GET /classes/:end_time to find classes that end by 6 PM. She selects "Yoga Flow," which fits her schedule. Next, Jane checks if the class has enough space for herself and her three friends by using GET /classes/:capacity. Finding availability, she proceeds to book the class for her group using POST /classes/:id/book, providing the user IDs of herself and her friends. The next day, when Jane arrives at the gym, she checks in using POST /checkins/:user_id/checkin. Finally, she reviews her check-in history using GET /checkins/users/:user_id/checkins to confirm she attended the class.
+
+GET /classes/ 
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+   
+2. [
+  {
+    "class_name": "Yoga Flow",
+    "class_type": "yoga",
+    "description": "A calming yoga class",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "08:00:00",
+    "end_time": "09:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+  {
+    "class_name": "HIIT Blast",
+    "class_type": "cardio",
+    "description": "High-intensity interval training",
+    "day": "2025-05-13",
+    "capacity": 15,
+    "start_time": "10:00:00",
+    "end_time": "11:00:00",
+    "instructor": "John",
+    "room_number": 2
+  }
+]
+
+GET /classes/date/{date}
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/date/2025-05-13' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+  
+2. [
+  {
+    "class_name": "Yoga Flow",
+    "class_type": "yoga",
+    "description": "A calming yoga class",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "08:00:00",
+    "end_time": "09:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+  {
+    "class_name": "HIIT Blast",
+    "class_type": "cardio",
+    "description": "High-intensity interval training",
+    "day": "2025-05-13",
+    "capacity": 15,
+    "start_time": "10:00:00",
+    "end_time": "11:00:00",
+    "instructor": "John",
+    "room_number": 2
+  }
+]
+
+GET /classes/end_time/{end_time}
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/end_time/18:00' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+
+2. [
+  {
+    "class_name": "Yoga Flow",
+    "class_type": "yoga",
+    "description": "A calming yoga class",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "08:00:00",
+    "end_time": "09:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+  {
+    "class_name": "HIIT Blast",
+    "class_type": "cardio",
+    "description": "High-intensity interval training",
+    "day": "2025-05-13",
+    "capacity": 15,
+    "start_time": "10:00:00",
+    "end_time": "11:00:00",
+    "instructor": "John",
+    "room_number": 2
+  }
+]
+
+GET /classes/capacity/{capacity}
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/capacity/4' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+  
+2. [
+  {
+    "class_name": "Yoga Flow",
+    "class_type": "yoga",
+    "description": "A calming yoga class",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "08:00:00",
+    "end_time": "09:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  }
+]
+
+POST /bookings/{class_id}/book 
+1. curl -X 'POST' \
+  'http://127.0.0.1:3000/bookings/101/book' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat' \
+  -d '{
+    "username": "jane"
+  }'
+  
+2. 204 No Content
+
+POST /checkins/{user_id}/checkin
+1. curl -X 'POST' \
+  'http://127.0.0.1:3000/checkins/2001/checkin' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+   
+2. 204 No Content
+
+GET /checkins/users/{user_id}/checkins 
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/checkins/users/2001/checkins' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+   
+2. [
+  {
+    "check_in_date": "2025-05-13",
+    "check_in_time": "10:55:00"
+  }
+]
