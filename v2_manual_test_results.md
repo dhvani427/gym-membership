@@ -215,7 +215,7 @@ GET /classes/:instructor
   }
 ]
 
-# Flow 4
+# Flow 4 User gets information about class and rooms
 Bob wants to look up a certain class and he only knows the id he uses GET /classes/id/{class_id}, he also wants to look up the room based on the class he was looking up so he gets the room_number from the results before and then does GET /rooms/rooms/:number. This makes him curious about all the rooms so he does GET /rooms/rooms
 
 GET /classes/id/{class_id}
