@@ -2,8 +2,8 @@
 
 Maria filters her search to see yoga classes using the GET /classes/:type endpoint, specifically searching for the yoga class type. To check if there are any 7am classes before her corporate job starts, she uses the GET /classes/:start_time endpoint, where she finds a class named "yoga flow" at 7:00 AM. Maria books it by using the POST /classes/:id/book endpoint, with the class ID being 3. After successfully booking the class, she can view all her upcoming bookings using the GET /users/:id/bookings endpoint, confirming her spot in the 7am yoga flow session with instructor Josephine in room 9 on May 13th, 2025.
 
-**GET /classes/:type
-**
+GET /classes/:type
+
 1. curl -X 'GET' \
   'http://127.0.0.1:3000/classes/type/yoga' \
   -H 'accept: application/json' \
@@ -34,8 +34,8 @@ Maria filters her search to see yoga classes using the GET /classes/:type endpoi
   }
 ]
 
-**GET /classes/:start_time
-**
+GET /classes/:start_time
+
 1. curl -X 'GET' \
   'http://127.0.0.1:3000/classes/start_time/07%3A00%3A00' \
   -H 'accept: application/json' \
@@ -55,8 +55,8 @@ Maria filters her search to see yoga classes using the GET /classes/:type endpoi
   }
 ]
 
-**POST /classes/:id/book
-**
+POST /classes/:id/book
+
 1. curl -X 'POST' \
   'http://127.0.0.1:3000/bookings/3/book?username=gymlover1000' \
   -H 'accept: */*' \
@@ -66,8 +66,8 @@ Maria filters her search to see yoga classes using the GET /classes/:type endpoi
 2. 204	
 Successful Response
 
-**GET /users/:id/bookings
-**
+GET /users/:id/bookings
+
 1. curl -X 'GET' \
   'http://127.0.0.1:3000/bookingsgymlover1000/bookings' \
   -H 'accept: application/json' \
