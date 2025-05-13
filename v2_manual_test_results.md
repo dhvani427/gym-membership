@@ -291,8 +291,8 @@ GET /classes/
     "description": "A calming yoga class",
     "day": "2025-05-13",
     "capacity": 10,
-    "start_time": "08:00:00",
-    "end_time": "09:00:00",
+    "start_time": "05:00:00.140Z",
+    "end_time": "06:00:00.140Z",
     "instructor": "Daniel",
     "room_number": 3
   },
@@ -302,8 +302,8 @@ GET /classes/
     "description": "High-intensity interval training",
     "day": "2025-05-13",
     "capacity": 15,
-    "start_time": "10:00:00",
-    "end_time": "11:00:00",
+    "start_time": "10:00:00.140Z",
+    "end_time": "11:00:00.140Z",
     "instructor": "John",
     "room_number": 2
   }
@@ -322,8 +322,8 @@ GET /classes/date/{date}
     "description": "A calming yoga class",
     "day": "2025-05-13",
     "capacity": 10,
-    "start_time": "08:00:00",
-    "end_time": "09:00:00",
+    "start_time": "05:00:00.140Z",
+    "end_time": "06:00:00.140Z",
     "instructor": "Daniel",
     "room_number": 3
   },
@@ -333,8 +333,8 @@ GET /classes/date/{date}
     "description": "High-intensity interval training",
     "day": "2025-05-13",
     "capacity": 15,
-    "start_time": "10:00:00",
-    "end_time": "11:00:00",
+    "start_time": "10:00:00.140Z",
+    "end_time": "11:00:00.140Z",
     "instructor": "John",
     "room_number": 2
   }
@@ -342,7 +342,7 @@ GET /classes/date/{date}
 
 GET /classes/end_time/{end_time}
 1. curl -X 'GET' \
-  'http://127.0.0.1:3000/classes/end_time/18:00' \
+  'http://127.0.0.1:3000/classes/end_time/06%3A37%3A02.344Z' \
   -H 'accept: application/json' \
   -H 'access_token: brat'
 
@@ -353,8 +353,8 @@ GET /classes/end_time/{end_time}
     "description": "A calming yoga class",
     "day": "2025-05-13",
     "capacity": 10,
-    "start_time": "08:00:00",
-    "end_time": "09:00:00",
+    "start_time": "05:00:00.140Z",
+    "end_time": "06:00:00.140Z",
     "instructor": "Daniel",
     "room_number": 3
   },
@@ -364,8 +364,8 @@ GET /classes/end_time/{end_time}
     "description": "High-intensity interval training",
     "day": "2025-05-13",
     "capacity": 15,
-    "start_time": "10:00:00",
-    "end_time": "11:00:00",
+    "start_time": "10:00:00.140Z",
+    "end_time": "11:00:00.140Z",
     "instructor": "John",
     "room_number": 2
   }
@@ -384,8 +384,8 @@ GET /classes/capacity/{capacity}
     "description": "A calming yoga class",
     "day": "2025-05-13",
     "capacity": 10,
-    "start_time": "08:00:00",
-    "end_time": "09:00:00",
+    "start_time": "05:00:00.140Z",
+    "end_time": "06:00:00.140Z",
     "instructor": "Daniel",
     "room_number": 3
   }
@@ -393,12 +393,10 @@ GET /classes/capacity/{capacity}
 
 POST /bookings/{class_id}/book 
 1. curl -X 'POST' \
-  'http://127.0.0.1:3000/bookings/101/book' \
-  -H 'accept: application/json' \
+  'http://127.0.0.1:3000/bookings/5/book?username=jane' \
+  -H 'accept: */*' \
   -H 'access_token: brat' \
-  -d '{
-    "username": "jane"
-  }'
+  -d ''
   
 2. 204 No Content
 
@@ -418,7 +416,11 @@ GET /checkins/users/{user_id}/checkins
    
 2. [
   {
-    "check_in_date": "2025-05-13",
-    "check_in_time": "10:55:00"
+    "check_in_date": "2025-05-12",
+    "check_in_time": "18:51:35.480129"
+  },
+  {
+    "check_in_date": "2025-05-12",
+    "check_in_time": "18:51:52.611009"
   }
 ]
