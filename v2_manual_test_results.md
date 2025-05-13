@@ -214,3 +214,63 @@ GET /classes/:instructor
     "room_number": 4
   }
 ]
+
+Flow 4
+Bob wants to look up a certain class and he only knows the id he uses GET /classes/id/{class_id}, he also wants to look up the room based on the class he was looking up so he gets the room_number from the results before and then does GET /rooms/rooms/:number. This makes him curious about all the rooms so he does GET /rooms/rooms
+
+GET /classes/id/{class_id}
+curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/id/1' \
+  -H 'accept: application/json' \
+  -H 'access_token: Brat'
+[
+   {
+   "class_name": "hot yoga",
+    "class_type": "yoga",
+    "description": "yoga class but hot",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "11:00:00",
+    "end_time": "12:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+
+GET /rooms/rooms/:number
+curl -X 'GET' \
+  'http://127.0.0.1:3000/rooms/rooms/:number?number=1' \
+  -H 'accept: application/json'
+
+[
+  {
+    "number": 3,
+    "capacity": 10,
+    "type": "mats"
+  }
+]
+
+GET /rooms/rooms
+curl -X 'GET' \
+  'http://127.0.0.1:3000/rooms/rooms' \
+  -H 'accept: application/json' \
+  -H 'access_token: Brat'
+
+[
+  {
+    "number": 3,
+    "capacity": 10,
+    "type": "mats"
+  },
+  {
+    "number": 5,
+    "capacity": 25,
+    "type": "bikes"
+  },
+  {
+    "number": 6,
+    "capacity": 5,
+    "type": "reformer"
+  }
+]
+
+
