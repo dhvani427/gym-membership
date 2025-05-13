@@ -88,3 +88,129 @@ GET /users/:id/bookings
   ]
 }
 
+# Flow 3: Instructor Sets Up a New Yoga Class
+
+Daniel, a certified instructor, logs into the gym's admin dashboard. He wants to add a new Yoga class to the schedule. First, he checks room availability using the GET /rooms endpoint. He identifies Room 3 as a yoga room. He then creates the new Yoga class using the POST /classes endpoint, naming it “hot yoga”, assigning it to Room 3, and setting the instructor as himself. To verify that the class was added successfully, he retrieves it by name using GET /classes/yoga. He then checks how many classes he has signed up to teach using GET /classes/:instructor to see his week’s schedule.
+
+
+GET /rooms/rooms
+
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/rooms/rooms' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+
+2. [
+  {
+    "number": 1,
+    "capacity": 10,
+    "type": "cycling"
+  },
+  {
+    "number": 2,
+    "capacity": 20,
+    "type": "cycling"
+  },
+  {
+    "number": 3,
+    "capacity": 30,
+    "type": "yoga"
+  }
+]
+
+POST /classes/
+
+1. curl -X 'POST' \
+  'http://127.0.0.1:3000/classes/' \
+  -H 'accept: */*' \
+  -H 'access_token: brat' \
+  -H 'Content-Type: application/json' \
+  -d ' {
+    "class_name": "hot yoga",
+    "class_type": "yoga",
+    "description": "yoga class but hot",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "11:00:00",
+    "end_time": "12:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  }
+
+2. 204	
+Successful Response
+
+GET /classes/:class_name
+
+1. 'curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/name/hot yoga' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+
+2. [
+  {
+   "class_name": "hot yoga",
+    "class_type": "yoga",
+    "description": "yoga class but hot",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "11:00:00",
+    "end_time": "12:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+  {
+    "class_name": "hot yoga",
+    "class_type": "yoga",
+    "description": "yoga class but hot",
+    "day": "2025-05-17",
+    "capacity": 8,
+    "start_time": "16:00:00",
+    "end_time": "17:00:00",
+    "instructor": "John",
+    "room_number": 15
+  }
+]
+
+GET /classes/:instructor
+
+1. curl -X 'GET' \
+  'http://127.0.0.1:3000/classes/instructor/Daniel' \
+  -H 'accept: application/json' \
+  -H 'access_token: brat'
+
+2. [
+   {
+   "class_name": "hot yoga",
+    "class_type": "yoga",
+    "description": "yoga class but hot",
+    "day": "2025-05-13",
+    "capacity": 10,
+    "start_time": "11:00:00",
+    "end_time": "12:00:00",
+    "instructor": "Daniel",
+    "room_number": 3
+  },
+{
+    "class_name": "breakaway",
+    "class_type": "cardio",
+    "description": "break a sweat with music",
+    "day": "2025-05-15",
+    "capacity": 10,
+    "start_time": "16:00:00",
+    "end_time": "17:00:00.",
+    "instructor": "Daniel",
+    "room_number": 20
+  },
+{
+    "class_name": "cycling",
+    "class_type": "cardio",
+    "description": "cycling with music",
+    "day": "2025-05-17",
+    "capacity": 15,
+    "start_time": "11:00:00",
+    "end_time": "12:00:00.",
+    "instructor": "Daniel",
+    "room_number": 4
+  }
+]
