@@ -195,5 +195,36 @@ Checkout and make a payment.
   "success": "boolean"
 }
 ```
+### **POST /checkins/{user_id}/checkin**
+Check in a user by inserting a row into the history table.
+
+#### Request
+```json
+{}
+```
+
+#### Response
+```json
+{
+  "success": "boolean"
+}
+```
+
+### **GET /checkins/users/{user_id}/checkins**
+Retrieve a user's check-in history.
+### Request
+```json
+{}
+```
+
+#### Response
+```json
+[
+  {
+    "check_in_date": "string",
+    "check_in_time": "string"
+  }
+]
+```
 
 ---
