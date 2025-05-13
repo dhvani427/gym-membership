@@ -1,4 +1,4 @@
-# Flow 2: Flow 2: User Books Yoga Class
+# Flow 2: User Books Yoga Class
 
 Maria filters her search to see yoga classes using the GET /classes/:type endpoint, specifically searching for the yoga class type. To check if there are any 7am classes before her corporate job starts, she uses the GET /classes/:start_time endpoint, where she finds a class named "yoga flow" at 7:00 AM. Maria books it by using the POST /classes/:id/book endpoint, with the class ID being 3. After successfully booking the class, she can view all her upcoming bookings using the GET /users/:id/bookings endpoint, confirming her spot in the 7am yoga flow session with instructor Josephine in room 9 on May 13th, 2025.
 
