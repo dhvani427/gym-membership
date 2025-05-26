@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 import sqlalchemy
@@ -78,6 +78,66 @@ def post_class(gym_class: Class):
             }
         )
 
+@router.get("/search", response_model=List[Class], tags=["classes"])
+def search_classes(
+    class_name: str = "",
+    class_type: str = "",
+    instructor: str = "",
+    day: Optional[date] = None,
+    start_time: Optional[time] = None,
+    end_time: Optional[time] = None,
+):
+    """
+    Search for classes using optional filters.
+    """
+    parameters = {}
+    query = """
+        SELECT * FROM classes WHERE 1=1
+    """
+
+    if class_name:
+        query += " AND class_name ILIKE :class_name"
+        parameters["class_name"] = f"%{class_name}%"
+
+    if class_type:
+        query += " AND class_type ILIKE :class_type"
+        parameters["class_type"] = f"%{class_type}%"
+
+    if instructor:
+        query += " AND instructor ILIKE :instructor"
+        parameters["instructor"] = f"%{instructor}%"
+
+    if day:
+        query += " AND day = :day"
+        parameters["day"] = day
+
+    if start_time:
+        query += " AND start_time >= :start_time"
+        parameters["start_time"] = start_time
+
+    if end_time:
+        query += " AND end_time <= :end_time"
+        parameters["end_time"] = end_time
+
+    with db.engine.begin() as connection:
+        results = connection.execute(sqlalchemy.text(query), parameters).fetchall()
+
+    return [
+        Class(
+            class_name=row[1],
+            class_type=row[2],
+            description=row[3],
+            day=row[4],
+            capacity=row[5],
+            start_time=row[6],
+            end_time=row[7],
+            instructor=row[8],
+            room_number=row[9],
+        )
+        for row in results
+    ]
+
+'''
 @router.get("/", response_model=List[Class])
 def get_all_classes():
     """
@@ -357,3 +417,4 @@ def get_by_instructor(instructor:str):
         instructor=row[8],
         room_number=row[9]
     ) for row in result ]
+'''
