@@ -233,95 +233,39 @@ Retrieve a user's check-in history.
 Retrieve available rooms based on for a given date.
 ### Request
 ```json
-curl -X 'GET' \
-  'http://127.0.0.1:3000/rooms/date?day=2025-05-15' \
-  -H 'accept: application/json' \
-  -H 'access_token: brat'
+{
+  "day": "YYYY-MM-DD"
+}
 ```
 
 #### Response
 ```json
 [
   {
-    "number": 10,
+    "number": "integer",
+    "day": "YYYY-MM-DD",
     "availability_slots": [
       {
-        "start": "06:00:00",
-        "end": "18:00:00"
-      }
-    ]
-  },
-  {
-    "number": 20,
-    "availability_slots": [
-      {
-        "start": "08:00:00",
-        "end": "14:00:00"
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
       },
       {
-        "start": "15:00:00",
-        "end": "16:00:00.788000"
-      },
-      {
-        "start": "17:00:00.788000",
-        "end": "18:00:00"
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
       }
     ]
   },
   {
-    "number": 30,
+    "number": "integer",
+    "day": "YYYY-MM-DD",
     "availability_slots": [
       {
-        "start": "10:00:00",
-        "end": "11:00:00.788000"
-      },
-      {
-        "start": "12:00:00.788000",
-        "end": "18:00:00"
-      }
-    ]
-  },
-  {
-    "number": 40,
-    "availability_slots": [
-      {
-        "start": "06:00:00",
-        "end": "18:00:00"
-      }
-    ]
-  },
-  {
-    "number": 50,
-    "availability_slots": [
-      {
-        "start": "06:00:00",
-        "end": "18:00:00"
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
       }
     ]
   }
+]
 
----
-
-### **POST /bookings/{class_id}/book**
-Book a class for a user.
-### Request
-```json
-curl -X 'POST' \
-  'http://127.0.0.1:3000/bookings/12/book?username=55' \
-  -H 'accept: application/json' \
-  -H 'access_token: brat' \
-  -d ''
 ```
-
-#### Response
-```json
-{
-  "class_id": 12,
-  "enrollment_status": "Class is full, please join the waitlist or choose another class"
-}
-```
-
----
-
-
 
