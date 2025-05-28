@@ -42,7 +42,7 @@ This isolation level prevents users from viewing in-progress or potentially roll
 
 # Case 2: Lost Update
 
-Two gym users, Sophia and Jake, both try to book the last available seat for a Yoga Class at the gym. Both see the same seat as available and proceed to book it simultaneously. Their booking updates overwrite each other, causing both to believe they secured the same seat. However, only one seat was available.
+Two gym users, Sophia and Jake, both try to book the last available seat for a Yoga Class at the gym. Both see the same seat as available and proceed to book it simultaneously. Both bookings are processed, causing both to believe they secured the same seat. However, only one seat was available.
 
 ## Sequence Diagram
 
