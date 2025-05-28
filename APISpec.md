@@ -283,7 +283,7 @@ Retrieve available rooms based on for a given date.
 ```json
 {
   "class_id": "integer",
-  "enrollment_status": "string"  //"Booking successful" or "Class is full, please join the waitlist or choose another class"
+  "enrollment_status": "string"
 }
 ```
 
@@ -324,7 +324,6 @@ Retrieve the waitlist for a specific class.
       "username": "string",
       "waitlist_position": "integer"
     },
-    ...
   ]
 }
 ```
