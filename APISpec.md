@@ -1,6 +1,6 @@
-# 🏋️ Gym Membership API Documentation
+# Gym Membership API Documentation
 
-## 📌 Endpoints
+## Endpoints
 
 ---
 
@@ -228,3 +228,121 @@ Retrieve a user's check-in history.
 ```
 
 ---
+
+### **GET /rooms/{date}**
+Retrieve available rooms based on for a given date.
+### Request
+```json
+{
+  "day": "YYYY-MM-DD"
+}
+```
+
+#### Response
+```json
+[
+  {
+    "number": "integer",
+    "day": "YYYY-MM-DD",
+    "availability_slots": [
+      {
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
+      },
+      {
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
+      }
+    ]
+  },
+  {
+    "number": "integer",
+    "day": "YYYY-MM-DD",
+    "availability_slots": [
+      {
+        "start": "HH:MM:SS",
+        "end": "HH:MM:SS"
+      }
+    ]
+  }
+]
+
+```
+---
+### **POST /bookings/{class_id}/book**
+Retrieve available rooms based on for a given date.
+### Request
+```json
+{
+  "username": "string",
+  "class_id": "integer"
+}
+```
+
+#### Response
+```json
+{
+  "class_id": "integer",
+  "enrollment_status": "string"
+}
+```
+
+### **POST /bookings/{class_id}/waitlist/join**
+Add a user to the waitlist for a class.
+### Request
+```json
+{
+  "username": "string",
+  "class_id": "integer"
+}
+```
+
+#### Response
+```json
+{
+  "username": "string",
+  "class_id": "integer",
+  "waitlist_position": "integer"
+}
+```
+
+### **GET /bookings/{class_id}/waitlist**
+Retrieve the waitlist for a specific class.
+### Request
+```json
+{
+  "class_id": "integer"
+}
+```
+
+#### Response
+```json
+{
+  "class_id": "integer",
+  "waitlist": [
+    {
+      "username": "string",
+      "waitlist_position": "integer"
+    },
+  ]
+}
+```
+
+### **DELETE /bookings/{class_id}/cancel**
+Cancel a user's booking for a class. If there are users on the waitlist, the first one is enrolled automatically.
+### Request
+```json
+{
+  "username": "string",
+  "class_id": "integer"
+}
+```
+
+#### Response
+```json
+{
+  "class_id": "integer",
+  "cancellation_status": "string",
+  "enrolled_from_waitlist": "string"
+}
+```
