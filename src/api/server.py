@@ -4,9 +4,14 @@ from starlette.middleware.cors import CORSMiddleware
 
 description = """
 Push Code 💻, Pull Weights 🏋️"""
+
 tags_metadata = [
-    {"name": "users", "description": "Get all the gym users"},
-    
+    {"name": "users", "description": "Manage gym users"},
+    {"name": "membership", "description": "Membership plans and status"},
+    {"name": "classes", "description": "Fitness class schedules"},
+    {"name": "bookings", "description": "Class bookings"},
+    {"name": "checkins", "description": "Gym check-in logs"},
+    {"name": "rooms", "description": "Room and facility management"},
 ]
 
 app = FastAPI(
@@ -38,14 +43,6 @@ app.include_router(bookings.router)
 app.include_router(checkins.router)
 app.include_router(rooms.router)
 
-'''
-app.include_router(carts.router)
-app.include_router(catalog.router)
-app.include_router(bottler.router)
-app.include_router(barrels.router)
-app.include_router(admin.router)
-app.include_router(info.router)
-'''
 
 @app.get("/")
 async def root():

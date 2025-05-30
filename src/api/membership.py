@@ -16,7 +16,7 @@ class MembershipPlan(BaseModel):
     cost: int
     max_classes: int
 
-@router.post("/membership", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("", status_code=status.HTTP_204_NO_CONTENT)
 def create_plan(membershipPlan: MembershipPlan):
     """
     Create new membership plan
@@ -58,7 +58,7 @@ class EnrollRequest(BaseModel):
 class EnrollResponse(BaseModel):
     message: str
 
-@router.post("/membership/{username}/enroll", response_model=EnrollResponse)
+@router.post("/{username}/enroll", response_model=EnrollResponse)
 def enroll_in_plan(username: str, data: EnrollRequest):
     """
     Enroll a user in a membership plan by username
@@ -73,10 +73,10 @@ def enroll_in_plan(username: str, data: EnrollRequest):
             {"username": username}
         ).fetchone()
 
-        if not user:
+        if not user:   
             raise HTTPException(status_code=404, detail="User not found.")
 
-        if user[7] is not None:
+        if user.membership_plan is not None:
             raise HTTPException(
                 status_code=400,
                 detail="User already enrolled in a plan. Please upgrade if you want a different plan."
@@ -102,7 +102,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
                 WHERE username = :username
                 """
             ),
-            {"username": username, "membership_plan": plan[0]}
+            {"username": username, "membership_plan": plan.membership_id}
         )
     return EnrollResponse(message="User successfully enrolled in membership plan.")
 
@@ -112,7 +112,7 @@ class MembershipResponse(BaseModel):
     cost: int
     max_classes: int
 
-@router.get("/membership/plans", response_model=List[MembershipResponse])
+@router.get("/plans", response_model=List[MembershipResponse])
 def get_membership_plans():
     """
     Get all membership plans
@@ -128,10 +128,10 @@ def get_membership_plans():
 
     return [
         MembershipResponse(
-            membership_id=row[0],
-            name=row[1],
-            cost=row[2],
-            max_classes=row[3]
+            membership_id=row.membership_id,
+            name=row.name,
+            cost=row.cost,
+            max_classes=row.max_classes
         )
         for row in result
     ]

@@ -4,7 +4,7 @@ from typing import List
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date, datetime
+from datetime import date, datetime,time
 
 router = APIRouter(
     prefix="/checkins",
@@ -35,8 +35,8 @@ def checkin_user(user_id: int):
         )
 
 class CheckinHistory(BaseModel):
-    check_in_date: str
-    check_in_time: str  
+    check_in_date: date
+    check_in_time: time  
 
 @router.get("/users/{user_id}/checkins", response_model=List[CheckinHistory])
 def get_user_checkins(user_id: int):
