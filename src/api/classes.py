@@ -50,6 +50,57 @@ def post_class(gym_class: Class):
                 status_code=400,
                 detail=f"Class capacity {gym_class.capacity} exceeds room capacity {room_capacity}"
             )
+        
+        if gym_class.start_time>gym_class.end_time:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Class start time is after the end time"
+            )
+        
+        conflict = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 FROM classes
+                WHERE room_number = :room_number
+                AND day = :day
+                """
+            ),
+            {
+                "room_number": gym_class.room_number,
+                "day": gym_class.day,
+                "start_time": gym_class.start_time,
+                "end_time": gym_class.end_time
+            }
+        ).first()
+
+        if conflict:
+            raise HTTPException(
+                status_code=409,
+                detail="Room already booked during the selected time slot"
+            )
+        
+        instructor_conflict = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 FROM classes
+                WHERE instructor = :instructor
+                AND day = :day
+                AND (start_time < :end_time AND end_time > :start_time)
+                """
+            ),
+            {
+                "instructor": gym_class.instructor,
+                "day": gym_class.day,
+                "start_time": gym_class.start_time,
+                "end_time": gym_class.end_time,
+            }
+        ).first()
+
+        if instructor_conflict:
+            raise HTTPException(
+                status_code=409,
+                detail="Instructor is already teaching another class at this time"
+            )
 
         # Proceed to insert the class
         connection.execute(
@@ -121,6 +172,9 @@ def search_classes(
 
     with db.engine.begin() as connection:
         results = connection.execute(sqlalchemy.text(query), parameters).fetchall()
+    
+    if not results:
+        raise HTTPException(status_code=404, detail="No classes found")
 
     return [
         Class(

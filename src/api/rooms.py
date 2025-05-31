@@ -53,7 +53,7 @@ def get_rooms():
         for row in result
     ]
 
-@router.get("/:number", response_model=List[RoomDescription])
+@router.get("/{number}", response_model=List[RoomDescription])
 def get_rooms_number(number: int):
     """
     Get all room numbers
@@ -77,7 +77,7 @@ def get_rooms_number(number: int):
         for row in result
     ]
 
-@router.get("/date", response_model=List[RoomAvailability])
+@router.get("/{day}", response_model=List[RoomAvailability])
 def get_available_rooms(day: date):
     """
     Get all available rooms
@@ -93,9 +93,7 @@ def get_available_rooms(day: date):
                 SELECT room_number FROM rooms
                 """
             )).fetchall()
-        
-        print(rooms)
-        
+                
         for room in rooms:
             room = room[0]
             bookings = connection.execute(

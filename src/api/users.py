@@ -27,10 +27,6 @@ def register_user(user: User):
     Getting all the gym users
     """
 
-    '''connection.execute(sqlalchemy.text("TRUNCATE global_ledger"))
-    connection.execute(sqlalchemy.text("TRUNCATE potion_ledger"))'''
-
-
     username = f"{user.username}"
 
     with db.engine.begin() as connection:
@@ -46,7 +42,7 @@ def register_user(user: User):
             return
 
 
-    with db.engine.begin() as connection:
+   
         connection.execute(
             sqlalchemy.text(
                 # changed
@@ -93,7 +89,6 @@ def get_user_info(username:str):
             }
         )
         user = result.fetchone()
-        print(user)
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
