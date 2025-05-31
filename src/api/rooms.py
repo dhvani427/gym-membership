@@ -53,29 +53,30 @@ def get_rooms():
         for row in result
     ]
 
-@router.get("/{number}", response_model=List[RoomDescription])
+@router.get("/{number}", response_model=RoomDescription)
 def get_rooms_number(number: int):
     """
-    Get all room numbers
+    Get room details by its number
     """
     with db.engine.begin() as connection:
-        result = connection.execute(
+        row = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT * FROM rooms
+                SELECT room_number, capacity, type 
+                FROM rooms
                 WHERE room_number =:number
                 """
             ),{"number": number}
-        ).all()
+        ).first()
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="Room not found")
 
-    return [
-        RoomDescription(
+    return RoomDescription(
             number=row.room_number,
             capacity=row.capacity,
             type=row.type,
         )
-        for row in result
-    ]
 
 @router.get("/{day}", response_model=List[RoomAvailability])
 def get_available_rooms(day: date):

@@ -12,9 +12,9 @@ router = APIRouter(
 )
 
 class MembershipPlan(BaseModel):
-    name: str
-    cost: int
-    max_classes: int
+    name: str = Field(..., min_length=1)
+    cost: int = Field(..., gt=0)
+    max_classes: int = Field(..., ge=0)
 
 @router.post("", status_code=status.HTTP_204_NO_CONTENT)
 def create_plan(membershipPlan: MembershipPlan):
@@ -22,6 +22,7 @@ def create_plan(membershipPlan: MembershipPlan):
     Create new membership plan
     """
     with db.engine.begin() as connection:
+        # check for duplicate plan name
         result = connection.execute(
             sqlalchemy.text(
                 """
@@ -32,6 +33,7 @@ def create_plan(membershipPlan: MembershipPlan):
             {"membership_plan": membershipPlan.name}
         ).fetchone()
 
+        # insert new plan
         if result:
             raise HTTPException(
                 status_code=400,
@@ -64,6 +66,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
     Enroll a user in a membership plan by username
     """
     with db.engine.begin() as connection:
+        # fetch the user by username
         user = connection.execute(
             sqlalchemy.text(
                 """
@@ -82,6 +85,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
                 detail="User already enrolled in a plan. Please upgrade if you want a different plan."
             )
 
+        # validate the requested membership plan
         plan = connection.execute(
             sqlalchemy.text(
                 """
@@ -94,6 +98,7 @@ def enroll_in_plan(username: str, data: EnrollRequest):
         if not plan:
             raise HTTPException(status_code=404, detail="Membership plan not found.")
 
+        # update user’s membership
         connection.execute(
             sqlalchemy.text(
                 """

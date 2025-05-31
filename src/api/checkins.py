@@ -20,6 +20,23 @@ def checkin_user(user_id: int):
     now = datetime.now()
 
     with db.engine.begin() as connection:
+        # check if user exists
+        user = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 
+                FROM users 
+                WHERE user_id = :user_id
+                """),
+            {"user_id": user_id}
+        ).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User does not exist. Cannot check in."
+            )
+
         connection.execute(
             sqlalchemy.text(
                 """
@@ -44,6 +61,23 @@ def get_user_checkins(user_id: int):
     Retrieve a user's checkin history.
     """
     with db.engine.begin() as connection:
+        # check if user exists
+        user = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 
+                FROM users 
+                WHERE user_id = :user_id
+                """),
+            {"user_id": user_id}
+        ).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User does not exist. Cannot retrieve check-in history."
+            )
+
         result = connection.execute(
             sqlalchemy.text(
                 """
