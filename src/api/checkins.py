@@ -38,7 +38,7 @@ class CheckinHistory(BaseModel):
     check_in_date: date
     check_in_time: time  
 
-@router.get("/users/{user_id}/checkins", response_model=List[CheckinHistory])
+@router.get("/{user_id}", response_model=List[CheckinHistory])
 def get_user_checkins(user_id: int):
     """
     Retrieve a user's checkin history.
