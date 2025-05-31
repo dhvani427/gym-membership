@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, Body
 from pydantic import BaseModel, Field
 
 import sqlalchemy
@@ -13,13 +13,19 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+class BookingRequest(BaseModel):
+    class_id: int
+    username: str
+
 class BookingResponse(BaseModel):
     class_id: int
     enrollment_status: str = Field(
         default="Booking successful")
 
-@router.post("/{class_id}/book", response_model=BookingResponse)
-def book_class(class_id: int, username: str):
+@router.post("/book", response_model=BookingResponse)
+def book_class(booking: BookingRequest):
+    class_id = booking.class_id
+    username = booking.username
     """
     Book a class for a user
     """
@@ -336,7 +342,7 @@ def join_waitlist(class_id: int, username: str):
         waitlist_position=current_position + 1 if current_position else 1
     )
 
-@router.get("/{username}/bookings")
+@router.get("/{username}")
 def get_bookings(username: str):
     """
     Get all class bookings for a user
