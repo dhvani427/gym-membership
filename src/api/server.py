@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api import users, membership, classes, bookings, checkins, rooms
+from src.api import users, membership, classes, bookings, checkins, rooms, generate_sample_data
 from starlette.middleware.cors import CORSMiddleware
 
 description = """
@@ -42,6 +42,7 @@ app.include_router(classes.router)
 app.include_router(bookings.router)
 app.include_router(checkins.router)
 app.include_router(rooms.router)
+app.include_router(generate_sample_data.router)
 
 
 @app.get("/")
