@@ -1,6 +1,6 @@
 ## Feedback 1: Rohan Udupa
 --
-# Code Review
+### Code Review
 
 **1. Redundant route naming (e.g., /users/users/register)**
 Updated route paths within users.py, rooms.py, and membership.py to remove the redundant /users, /rooms, etc
@@ -39,3 +39,62 @@ Didn't seem to be missing
 
 **11. No check for full classes in booking**
 Added a capacity check and returning proper message
+
+## Feedback 2: Felix
+--
+### Code Review
+
+**1. Combine Class Filters into a Single Endpoint**
+Combine into one endpoint using query parameters
+
+**2. Hardcoded Column Indices in Query Results**
+(Repeated)
+
+**3. Inconsistent Return Type for get_by_id**
+(Repeated)
+
+**4. No None Check in get_by_id**
+(Repeated)
+
+**6. Duplicate Query Patterns**
+Every query is pulling different columns and different data
+
+**8. Unnecessary Print Statements**
+For debugging purposed, removed now
+
+**9. No Validation for Time Ranges**
+Added check for whether end time is after start time, and returning appropriate message
+
+**10. No Unique Constraint Handling**
+Added a check for only unique classes get added 
+
+**12. Ambiguous Parameter Naming in get_by_date**
+Fixed so that the naming is the same
+
+**13. No Error Handling for Empty Query Results**
+Adding appropriate messages
+
+**14. Lack of Docstrings for Most Endpoints**
+All endpoints had docstrings
+
+## Feedback 3: Alex
+--
+### Code Review
+
+**1. TRUNCATE statements in users.py**
+Removed the truncate lines entirely
+
+**2. Two transactions in /users/register**
+Combined all DB operations under a single with db.engine.begin() block
+
+**3. No client feedback for existing users**
+Added message -> "User already exists. No changes made."
+
+**4. GET /rooms and GET /rooms/{number} readability**
+Using column names instead of indices now to return data
+
+**5. membership.py return statement readability**
+Using column names instead of indices now to return data
+
+**6. bookings.py should use .first() and null check**
+Added a check if no result is found and returning no booking for user message
