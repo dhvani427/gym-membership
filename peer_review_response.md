@@ -1,5 +1,5 @@
 ## Feedback 1: Rohan Udupa
---
+
 ### Code Review
 
 **1. Redundant route naming (e.g., /users/users/register)**
@@ -41,7 +41,7 @@ Didn't seem to be missing
 Added a capacity check and returning proper message
 
 ## Feedback 2: Felix
---
+
 ### Code Review
 
 **1. Combine Class Filters into a Single Endpoint**
@@ -78,7 +78,7 @@ Adding appropriate messages
 All endpoints had docstrings
 
 ## Feedback 3: Alex
---
+
 ### Code Review
 
 **1. TRUNCATE statements in users.py**
