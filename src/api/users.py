@@ -24,11 +24,12 @@ class User(BaseModel):
 @router.post("/register", status_code=status.HTTP_204_NO_CONTENT)
 def register_user(user: User):
     """
-    Getting all the gym users
+    Registering a user to the gym
     """
 
     username = f"{user.username}"
 
+    # check if the user already exists
     with db.engine.begin() as connection:
         existing = connection.execute(
             sqlalchemy.text(
@@ -38,14 +39,11 @@ def register_user(user: User):
         ).first()
 
         if existing:
-            print("User already exists. No changes made.")
-            return
+            raise HTTPException(status_code=409, detail="User already exists")
 
-
-   
+        # insert the new user if not already present
         connection.execute(
             sqlalchemy.text(
-                # changed
                 """
                 INSERT INTO users (username, password, date_of_birth, first_name, last_name, email)
                 VALUES (:username, :password, :date_of_birth, :first_name, :last_name, :email)
@@ -78,7 +76,6 @@ def get_user_info(username:str):
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
-                # changed
                 """
                 SELECT * FROM users 
                 WHERE username = :username
@@ -92,6 +89,7 @@ def get_user_info(username:str):
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
+        
     return UserResponse(
         username=user.username,
         date_of_birth=user.date_of_birth,
