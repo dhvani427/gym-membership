@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt
 from typing import List
 import sqlalchemy
 from src.api import auth
@@ -12,12 +12,12 @@ router = APIRouter(
 )
 
 class MembershipPlan(BaseModel):
-    name: str
-    cost: int
+    membership_plan: str
+    cost: PositiveInt = Field(..., gt=0, description="Cost of the membership plan in dollars")
     max_classes: int
 
-@router.post("", status_code=status.HTTP_204_NO_CONTENT)
-def create_plan(membershipPlan: MembershipPlan):
+@router.post("/", status_code=status.HTTP_204_NO_CONTENT)
+def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
     """
     Create new membership plan
     """
@@ -26,10 +26,10 @@ def create_plan(membershipPlan: MembershipPlan):
             sqlalchemy.text(
                 """
                 SELECT * FROM membership
-                WHERE name = :membership_plan
+                WHERE membership_plan = :membership_plan
                 """
                 ),
-            {"membership_plan": membershipPlan.name}
+            {"membership_plan": membershipPlan.membership_plan}
         ).fetchone()
 
         if result:
@@ -41,25 +41,25 @@ def create_plan(membershipPlan: MembershipPlan):
             connection.execute(
                 sqlalchemy.text(
                     """
-                    INSERT INTO membership (name, cost, max_classes)
+                    INSERT INTO membership (membership_plan, cost, max_classes)
                     VALUES (:membership_plan, :cost, :max_classes)
                     """
                 ),
                 {
-                    "membership_plan": membershipPlan.name,
+                    "membership_plan": membershipPlan.membership_plan,
                     "cost": membershipPlan.cost,
                     "max_classes": membershipPlan.max_classes
                 }
             )
 
 class EnrollRequest(BaseModel):
-    name: str
+    membership_id: int
 
 class EnrollResponse(BaseModel):
     message: str
 
-@router.post("/{username}/enroll", response_model=EnrollResponse)
-def enroll_in_plan(username: str, data: EnrollRequest):
+@router.post("/{user_id}/enroll", response_model=EnrollResponse)
+def enroll_in_plan(user_id: str, data: EnrollRequest):
     """
     Enroll a user in a membership plan by username
     """
@@ -67,16 +67,16 @@ def enroll_in_plan(username: str, data: EnrollRequest):
         user = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT * FROM users WHERE username = :username
+                SELECT * FROM users WHERE user_id = :user_id
                 """
                 ),
-            {"username": username}
+            {"user_id": user_id}
         ).fetchone()
 
-        if not user:   
+        if not user:
             raise HTTPException(status_code=404, detail="User not found.")
 
-        if user.membership_plan is not None:
+        if user.membership_id is not None:
             raise HTTPException(
                 status_code=400,
                 detail="User already enrolled in a plan. Please upgrade if you want a different plan."
@@ -85,10 +85,10 @@ def enroll_in_plan(username: str, data: EnrollRequest):
         plan = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT * FROM membership WHERE name = :name
+                SELECT * FROM membership WHERE membership_id = :membership_id
                 """
             ),
-            {"name": data.name}
+            {"membership_id": data.membership_id}
         ).fetchone()
 
         if not plan:
@@ -98,17 +98,17 @@ def enroll_in_plan(username: str, data: EnrollRequest):
             sqlalchemy.text(
                 """
                 UPDATE users
-                SET membership_plan = :membership_plan
-                WHERE username = :username
+                SET membership = :membership_id
+                WHERE user_id = :user_id
                 """
             ),
-            {"username": username, "membership_plan": plan.membership_id}
+            {"user_id": user_id, "membership_id": data.membership_id}
         )
     return EnrollResponse(message="User successfully enrolled in membership plan.")
 
 class MembershipResponse(BaseModel):
     membership_id: int
-    name: str
+    membership_plan: str
     cost: int
     max_classes: int
 
@@ -128,10 +128,10 @@ def get_membership_plans():
 
     return [
         MembershipResponse(
-            membership_id=row.membership_id,
-            name=row.name,
-            cost=row.cost,
-            max_classes=row.max_classes
+            membership_id=row[0],
+            membership_plan=row[1],
+            cost=row[2],
+            max_classes=row[3]
         )
         for row in result
     ]
