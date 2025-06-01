@@ -376,6 +376,9 @@ def get_bookings(username: str):
             {"user_id": user_id}
         )
 
+        if not result:
+            raise HTTPException(status_code=404, detail="No bookings found for this user.")
+
         bookings = [{"class_id": row.class_id,
             "class_name": row.class_name,
             "day": str(row.day),
