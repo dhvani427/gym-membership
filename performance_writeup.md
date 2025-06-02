@@ -22,7 +22,9 @@
 /bookings/{username}
 
 /checkins/{user_id}/checkin
+- 500 INTERNAL SERVER ERROR
 /checkins/{user_id}
+- Elapsed time: 0.13524794578552246 seconds
 
 /rooms
 - Elapsed time: 0.008251190185546875 seconds
