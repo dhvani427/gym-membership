@@ -4,8 +4,10 @@ from pydantic import BaseModel, Field
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date
+import datetime
 from typing import Optional
+
+import time
 
 router = APIRouter(
     prefix="/bookings",
@@ -24,6 +26,7 @@ class BookingResponse(BaseModel):
 
 @router.post("/book", response_model=BookingResponse)
 def book_class(booking: BookingRequest):
+    start_time = time.time()
     class_id = booking.class_id
     username = booking.username
     """
@@ -121,6 +124,7 @@ def cancel_booking(class_id: int, username: str):
     """
     Cancel a class booking for a user, and enroll first waitlist user
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # Check if user exists
         user = connection.execute(
@@ -210,6 +214,7 @@ def get_waitlist(class_id: int):
     """
     Get all users on the waitlist for a class
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # check if class exists
         gym_class = connection.execute(
@@ -253,6 +258,7 @@ def join_waitlist(class_id: int, username: str):
     """
     Join the waitlist for a class
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # check if user exists
         user = connection.execute(
@@ -347,6 +353,7 @@ def get_bookings(username: str):
     """
     Get all class bookings for a user
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # get user_id
         user = connection.execute(

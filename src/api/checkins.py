@@ -4,7 +4,9 @@ from typing import List
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date, datetime,time
+import datetime
+
+import time
 
 router = APIRouter(
     prefix="/checkins",
@@ -17,6 +19,7 @@ def checkin_user(user_id: int):
     """
     Check in a user by inserting a row into the history table.
     """
+    start_time = time.time()
     now = datetime.now()
 
     with db.engine.begin() as connection:
@@ -52,14 +55,15 @@ def checkin_user(user_id: int):
         )
 
 class CheckinHistory(BaseModel):
-    check_in_date: date
-    check_in_time: time  
+    check_in_date: datetime.date
+    check_in_time: datetime.time
 
 @router.get("/{user_id}", response_model=List[CheckinHistory])
 def get_user_checkins(user_id: int):
     """
     Retrieve a user's checkin history.
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # check if user exists
         user = connection.execute(

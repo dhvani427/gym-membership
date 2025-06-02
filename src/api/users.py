@@ -6,6 +6,8 @@ from src.api import auth
 from src import database as db
 from datetime import date
 
+import time
+
 router = APIRouter(
     prefix="/users",
     tags=["users"],
@@ -26,7 +28,7 @@ def register_user(user: User):
     """
     Registering a user to the gym
     """
-
+    start_time = time.time()
     username = f"{user.username}"
 
     # check if the user already exists
@@ -58,7 +60,9 @@ def register_user(user: User):
 
             }
         )
-
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
 class UserResponse(BaseModel):
     username: str
@@ -73,6 +77,7 @@ def get_user_info(username:str):
     """
     Get user details
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
@@ -89,7 +94,11 @@ def get_user_info(username:str):
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-        
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
     return UserResponse(
         username=user.username,
         date_of_birth=user.date_of_birth,

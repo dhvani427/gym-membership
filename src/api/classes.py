@@ -6,7 +6,9 @@ from typing import List, Optional
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date, time
+
+import datetime
+import time
 
 router = APIRouter(
     prefix="/classes",
@@ -18,10 +20,10 @@ class Class(BaseModel):
     class_name: str
     class_type: str
     description: str
-    day: date
+    day: datetime.date
     capacity: int
-    start_time: time
-    end_time: time
+    start_time: datetime.time
+    end_time: datetime.time
     instructor: str
     room_number: int
 
@@ -31,6 +33,7 @@ def post_class(gym_class: Class):
     """
     Posting a class
     """
+    start_time = time.time()
 
     with db.engine.begin() as connection:
         result = connection.execute(
@@ -128,19 +131,23 @@ def post_class(gym_class: Class):
                 "room_number": gym_class.room_number,
             }
         )
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
 
 @router.get("/search", response_model=List[Class], tags=["classes"])
 def search_classes(
     class_name: str = "",
     class_type: str = "",
     instructor: str = "",
-    day: Optional[date] = None,
-    start_time: Optional[time] = None,
-    end_time: Optional[time] = None,
+    day: Optional[datetime.date] = None,
+    start_time: Optional[datetime.time] = None,
+    end_time: Optional[datetime.time] = None,
 ):
     """
     Search for classes using optional filters.
     """
+    start_time = time.time()
     parameters = {}
     query = """
         SELECT * FROM classes WHERE 1=1
@@ -175,6 +182,10 @@ def search_classes(
     
     if not results:
         raise HTTPException(status_code=404, detail="No classes found")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
     return [
         Class(
