@@ -31,7 +31,7 @@ def upgrade():
     conn.execute(text("""
         UPDATE history
         SET check_in_date = CURRENT_DATE,
-            check_in_time = CURRENT_TIME
+            check_in_time = CURRENT_TIME::time
     """))
 
     op.alter_column("classes", "day", type_=sa.Date(), existing_type=sa.String)
@@ -43,8 +43,8 @@ def upgrade():
     conn.execute(text("""
         UPDATE classes
         SET day = CURRENT_DATE,
-            start_time = CURRENT_TIME,
-            end_time = CURRENT_TIME
+            start_time = CURRENT_TIME::time,
+            end_time = CURRENT_TIME::time
     """))
 
 
@@ -58,7 +58,7 @@ def downgrade() -> None:
     conn.execute(text("""
         UPDATE history
         SET check_in_date = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'),
-            check_in_time = TO_CHAR(CURRENT_TIME, 'HH24:MI:SS')
+            check_in_time = TO_CHAR(CURRENT_TIME::time, 'HH24:MI:SS')
     """))
 
     # Revert column types in 'classes'
@@ -69,6 +69,6 @@ def downgrade() -> None:
     conn.execute(text("""
         UPDATE classes
         SET day = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'),
-            start_time = TO_CHAR(CURRENT_TIME, 'HH24:MI:SS'),
-            end_time = TO_CHAR(CURRENT_TIME, 'HH24:MI:SS')
+            start_time = TO_CHAR(CURRENT_TIME::time, 'HH24:MI:SS'),
+            end_time = TO_CHAR(CURRENT_TIME::time, 'HH24:MI:SS')
     """))
