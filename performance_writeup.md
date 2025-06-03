@@ -1,31 +1,34 @@
 /users/register
-- Elapsed time: 0.03457951545715332 seconds
+- Elapsed time: 0.013005495071411133 seconds
 /users/{username}
-- Elapsed time: 0.003934383392333984 seconds
+- Elapsed time: 0.003950357437133789 seconds
 
 /membership/
-- Elapsed time: 0.03193545341491699 seconds
+- Elapsed time: 0.009448051452636719 seconds
 /membership/{user_id}/enroll
-- 500 ERROR
+- Elapsed time: 0.009448051452636719 seconds
 /membership/plans
-- Elapsed time: 0.008458852767944336 seconds
+- Elapsed time: 0.0007572174072265625 seconds
 
 /classes/
-- Elapsed time: 0.08470582962036133 seconds
+- Elapsed time: 0.013226747512817383 seconds
 /classes/search
-- 500 error
+- Elapsed time: 0.0179288387298584 seconds
 
 /bookings/book
 /bookings/{class_id}/cancel
+- Elapsed time: 0.0521090030670166 seconds
 /bookings/{class_id}/waitlist
+- Elapsed time: 0.011786460876464844 seconds
 /bookings/{class_id}/waitlist/join
+- Elapsed time: 0.02221822738647461 seconds
 /bookings/{username}
+- Elapsed time: 0.019140243530273438 seconds
 
 /checkins/{user_id}/checkin
-- 500 INTERNAL SERVER ERROR
-  
+- Elapsed time: 0.016108036041259766 seconds
 /checkins/{user_id}
-- Elapsed time: 0.13524794578552246 seconds
+- Elapsed time: 0.02290201187133789 seconds
 
 /rooms
 - Elapsed time: 0.008251190185546875 seconds
@@ -36,6 +39,6 @@
 
 
 /sample_data
-- Elapsed time: 148.93484473228455 seconds
+- Elapsed time: 186.74650645256042 seconds
 
 
