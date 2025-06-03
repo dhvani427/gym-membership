@@ -1,4 +1,4 @@
-### Fake Data Modeling
+## Fake Data Modeling
 
 **Users (50,000):**  
 A good approximation for a growing gym brand with several branches.
@@ -23,7 +23,7 @@ Not all gym visits are for a class - this includes general workout sessions, whi
 
 ---
 
-### API Performance Metrics
+## API Performance Metrics
 
 #### `/users`
 - `POST /users/register` — *Elapsed time: 0.013005495071411133 seconds*
@@ -60,9 +60,10 @@ Not all gym visits are for a class - this includes general workout sessions, whi
 
 - `GET /sample_data` — *Elapsed time: 186.74650645256042 seconds*
 
-### Performance Tuning
+---
+## Performance Tuning
 
-# Before Optimization:
+### Before Optimization:
 
 Slowest Endpoint: `DELETE /bookings/{class_id}/cancel`
 
@@ -89,13 +90,13 @@ Limit  (cost=61.43..61.43 rows=1 width=23) (actual time=3.592..3.593 rows=1 loop
 Planning Time: 7.704 ms  
 Execution Time: 4.752 ms
 
-# Explanation:
+### Explanation:
 
 For performance tuning, we identified the slowest endpoint as the class cancellation route, which involves multiple SQL operations including user lookup, booking deletion, and waitlist promotion. We ran EXPLAIN ANALYZE on the slowest query, the one selecting the first user from the waitlist, and found that it was performing a Bitmap Heap Scan followed by a full sort on waitlist_position to retrieve the lowest-ranked waitlisted user. This sort operation, combined with the nested loop join, was contributing to the overall latency. 
 
 The query scanned all rows matching the class_id in the waitlist table before sorting them by waitlist_position, which is inefficient as the waitlist grows in size. Despite the LIMIT 1 clause, the database executed a full sort of all matching rows prior to limiting the output.
 
-# After Optimization
+### After Optimization
 
 To optimize this, we created a composite index on (class_id, waitlist_position). This index enables the database to efficiently:
 - Filter rows by class_id
@@ -127,7 +128,7 @@ Limit  (cost=0.57..13.64 rows=1 width=23) (actual time=0.784..0.785 rows=1 loops
 Planning Time: 4.934 ms
 Execution Time: 0.905 ms
 
-# Explanation:
+### Explanation:
 After creating the index on (class_id, waitlist_position), I reran EXPLAIN ANALYZE on the same query. This time, the output showed that PostgreSQL used an Index Scan on idx_waitlist_class_position, which means it was able to directly look up the correct rows in the right order without needing to sort them first.
 
 Before: 4.75 ms (with sort and bitmap heap scan)
