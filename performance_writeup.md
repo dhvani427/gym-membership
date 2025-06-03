@@ -80,6 +80,7 @@ LIMIT 1;
 ```
 
 Result:
+```
 Limit  (cost=61.43..61.43 rows=1 width=23) (actual time=3.592..3.593 rows=1 loops=1)
   ->  Sort  (cost=61.43..61.44 rows=5 width=23) (actual time=3.591..3.591 rows=1 loops=1)
         Sort Key: w.waitlist_position
@@ -89,6 +90,7 @@ Limit  (cost=61.43..61.43 rows=1 width=23) (actual time=3.592..3.593 rows=1 loop
               ->  Index Scan using users_pkey on users u ...
 Planning Time: 7.704 ms  
 Execution Time: 4.752 ms
+```
 
 ### Explanation:
 
@@ -119,6 +121,7 @@ LIMIT 1;
 ```
 
 Result:
+```
 Limit  (cost=0.57..13.64 rows=1 width=23) (actual time=0.784..0.785 rows=1 loops=1)
   ->  Nested Loop  (cost=0.57..65.91 rows=5 width=23) (actual time=0.783..0.783 rows=1 loops=1)
         ->  Index Scan using idx_waitlist_class_position on waitlist w  (cost=0.29..24.37 rows=5 width=8) (actual time=0.700..0.701 rows=1 loops=1)
@@ -127,6 +130,7 @@ Limit  (cost=0.57..13.64 rows=1 width=23) (actual time=0.784..0.785 rows=1 loops
               Index Cond: (user_id = w.user_id)
 Planning Time: 4.934 ms
 Execution Time: 0.905 ms
+```
 
 ### Explanation:
 After creating the index on (class_id, waitlist_position), I reran EXPLAIN ANALYZE on the same query. This time, the output showed that PostgreSQL used an Index Scan on idx_waitlist_class_position, which means it was able to directly look up the correct rows in the right order without needing to sort them first.
