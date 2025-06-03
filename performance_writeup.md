@@ -59,3 +59,79 @@ Not all gym visits are for a class - this includes general workout sessions, whi
 ### Sample Data Generation
 
 - `GET /sample_data` — *Elapsed time: 186.74650645256042 seconds*
+
+### Performance Tuning
+
+# Before Optimization:
+
+Slowest Endpoint: `DELETE /bookings/{class_id}/cancel`
+
+We identified the class cancellation endpoint as the slowest. The query that selects the first user from the waitlist was the slower query:
+
+```sql
+EXPLAIN ANALYZE
+SELECT w.user_id, w.waitlist_position, u.username
+FROM waitlist w
+JOIN users u ON w.user_id = u.user_id
+WHERE w.class_id = 1
+ORDER BY w.waitlist_position
+LIMIT 1;
+```
+
+Result:
+Limit  (cost=61.43..61.43 rows=1 width=23) (actual time=3.592..3.593 rows=1 loops=1)
+  ->  Sort  (cost=61.43..61.44 rows=5 width=23) (actual time=3.591..3.591 rows=1 loops=1)
+        Sort Key: w.waitlist_position
+        Sort Method: top-N heapsort  Memory: 25kB
+        ->  Nested Loop  (cost=4.61..61.40 rows=5 width=23) (actual time=1.398..2.776 rows=5 loops=1)
+              ->  Bitmap Heap Scan on waitlist w ...
+              ->  Index Scan using users_pkey on users u ...
+Planning Time: 7.704 ms  
+Execution Time: 4.752 ms
+
+# Explanation:
+
+For performance tuning, we identified the slowest endpoint as the class cancellation route, which involves multiple SQL operations including user lookup, booking deletion, and waitlist promotion. We ran EXPLAIN ANALYZE on the slowest query, the one selecting the first user from the waitlist, and found that it was performing a Bitmap Heap Scan followed by a full sort on waitlist_position to retrieve the lowest-ranked waitlisted user. This sort operation, combined with the nested loop join, was contributing to the overall latency. 
+
+The query scanned all rows matching the class_id in the waitlist table before sorting them by waitlist_position, which is inefficient as the waitlist grows in size. Despite the LIMIT 1 clause, the database executed a full sort of all matching rows prior to limiting the output.
+
+# After Optimization
+
+To optimize this, we created a composite index on (class_id, waitlist_position). This index enables the database to efficiently:
+- Filter rows by class_id
+- Retrieve rows already sorted by waitlist_position
+
+As a result, the database can directly access the lowest waitlist position without performing a full sort, significantly improving query performance.
+
+```sql
+CREATE INDEX idx_waitlist_class_position ON waitlist(class_id, waitlist_position);
+```
+
+```sql
+EXPLAIN ANALYZE
+SELECT w.user_id, w.waitlist_position, u.username
+FROM waitlist w
+JOIN users u ON w.user_id = u.user_id
+WHERE w.class_id = 1
+ORDER BY w.waitlist_position
+LIMIT 1;
+```
+
+Result:
+Limit  (cost=0.57..13.64 rows=1 width=23) (actual time=0.784..0.785 rows=1 loops=1)
+  ->  Nested Loop  (cost=0.57..65.91 rows=5 width=23) (actual time=0.783..0.783 rows=1 loops=1)
+        ->  Index Scan using idx_waitlist_class_position on waitlist w  (cost=0.29..24.37 rows=5 width=8) (actual time=0.700..0.701 rows=1 loops=1)
+              Index Cond: (class_id = 1)
+        ->  Index Scan using users_pkey on users u  (cost=0.29..8.31 rows=1 width=19) (actual time=0.072..0.072 rows=1 loops=1)
+              Index Cond: (user_id = w.user_id)
+Planning Time: 4.934 ms
+Execution Time: 0.905 ms
+
+# Explanation:
+After creating the index on (class_id, waitlist_position), I reran EXPLAIN ANALYZE on the same query. This time, the output showed that PostgreSQL used an Index Scan on idx_waitlist_class_position, which means it was able to directly look up the correct rows in the right order without needing to sort them first.
+
+Before: 4.75 ms (with sort and bitmap heap scan)
+After: 0.9 ms (with index scan and no sort)
+
+The composite index on (class_id, waitlist_position) made the query faster because it helps the database quickly find all waitlist entries for a specific class already sorted by their position. This means the database doesn’t have to look through the whole table or do extra sorting after getting the data. Instead, it can jump straight to the first waitlist entry it needs, which makes the query run much faster
+
