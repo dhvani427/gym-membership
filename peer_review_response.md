@@ -98,3 +98,41 @@ Using column names instead of indices now to return data
 
 **6. bookings.py should use .first() and null check**
 Added a check if no result is found and returning no booking for user message
+
+**7. Input validation for the MembershipPlan class**
+Added the following validations:
+    name: str = Field(..., min_length=1)
+    cost: int = Field(..., gt=0)
+    max_classes: int = Field(..., ge=0)
+
+## Feedback 4: Shane
+
+### Code Review
+
+**1. Adding extra comments to users.py**
+Added comments for context
+
+**2. Replacing print with HTTP**
+Replaced with raise HTTPException(status_code=409, detail="User already exists")
+
+**3. Adding extra comments to membership.py**
+Added comments for context
+
+**4. Checking if user exists for checkins.py.checkin_user**
+raise HTTPException(status_code=404, detail="User does not exist. Cannot check in.") if user doesn't exist
+
+**5. Checking if user exists for checkins.py.get_user_checkins**
+raise HTTPException(status_code=404, detail="User does not exist. Cannot retrieve check-in history.") if user doesn't exist
+
+**6. Change the response model for "/rooms/:number"**
+Changed to response_model=RoomDescription instead of a List since it only returns one
+
+## Feedback 5: Khoa
+
+### Code Review
+
+**1. Wrong comment for /users/register**
+Changed to "Registering a user to the gym"
+
+
+
