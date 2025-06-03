@@ -1,11 +1,17 @@
 ### Fake Data Modeling
 
 **Users (50,000):** A good approximation for a growing gym brand with several branches.
+
 **Rooms (50):** Enough to support a wide variety of equipment types, capacities, and specialized spaces.
+
 **Memberships (50):** Supports a wide range of plans — different classes, pool access, VIP options, private rooms, etc.
+
 **Classes (1,900):** Covers many types (yoga, abs, pilates, spin) with different instructors, time slots, difficulty levels, and capacities.
+
 **Waitlist (10,000):** On average ~10 people waitlisted per class depending on popularity and demand.
+
 **Bookings (338,000):** Users book many classes, creating high volume in the system.
+
 **History (600,000):** Not all gym visits are for a class - this includes general workout sessions, which are estimated to be twice as frequent as class bookings.
 
 /users/register
