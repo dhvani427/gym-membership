@@ -109,6 +109,10 @@ def book_class(booking: BookingRequest):
             {"user_id": user_id, "class_id": class_id}
         )
 
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
+
         return BookingResponse(
             class_id=class_id,
             enrollment_status="Booking successful"
@@ -203,6 +207,10 @@ def cancel_booking(class_id: int, username: str):
                 {"class_id": class_id}
             )
 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
     return CancelResponse(
         class_id=class_id,
         cancellation_status="Booking cancelled successfully",
@@ -245,6 +253,10 @@ def get_waitlist(class_id: int):
         )
 
         waitlist = [{"username": row.username, "waitlist_position": row.waitlist_position} for row in result]
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
     return {"class_id": class_id, "waitlist": waitlist}
 
@@ -342,6 +354,10 @@ def join_waitlist(class_id: int, username: str):
                 "waitlist_position": current_position + 1 if current_position else 1
             }
         )
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
     return JoinWaitlistResponse(
         username=username,
         class_id=class_id,
@@ -391,5 +407,8 @@ def get_bookings(username: str):
             "instructor": row.instructor,
             "room_number": row.room_number
             } for row in result]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
     return {"username": username, "bookings": bookings}

@@ -53,6 +53,9 @@ def checkin_user(user_id: int):
                 "check_in_time": now.time(),
             }
         )
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
 
 class CheckinHistory(BaseModel):
     check_in_date: datetime.date
@@ -92,6 +95,10 @@ def get_user_checkins(user_id: int):
             ),
             {"user_id": user_id}
         ).fetchall()
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
 
         return [
             CheckinHistory(
