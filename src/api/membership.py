@@ -79,7 +79,7 @@ def enroll_in_plan(user_id: str, data: EnrollRequest):
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")
 
-        if user.membership_id is not None:
+        if user.membership is not None:
             raise HTTPException(
                 status_code=400,
                 detail="User already enrolled in a plan. Please upgrade if you want a different plan."
