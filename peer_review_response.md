@@ -183,6 +183,15 @@ Changed to response_model=RoomDescription instead of a List since it only return
 **1. Wrong comment for /users/register**
 Changed to "Registering a user to the gym"
 
+**2. Hash passwords**
+Not in the scope of the project so not implementing
+
+**3. Consider using helper functions**
+Not implementing so that we can be more flexible with the queries in case we need to change it
+
+**4. Consider using request models**
+We have multiple request models implemented
+
 ## API/Schema
 **1.consider using the the actual time datatypes for instead of string check_in_date and check_in_time.**
 We addressed these issues in a new revision - column types were updated and existing values set to current date and time.
