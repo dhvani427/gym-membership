@@ -77,7 +77,7 @@ Adding appropriate messages
 **14. Lack of Docstrings for Most Endpoints**
 All endpoints had docstrings
 
-## Feedback 3: Alex
+## Feedback 3: Alex Truong
 
 ### Code Review
 
@@ -104,6 +104,48 @@ Added the following validations:
     name: str = Field(..., min_length=1)
     cost: int = Field(..., gt=0)
     max_classes: int = Field(..., ge=0)
+
+### API/Schema
+**1. The users route has two endpoints with POST /users/register and GET /users/{username}. I believe it's ideal to reduce the complexity and length of endpoints as much as possible without sacrificing readability and functionality so I would just having /users/...**
+We fixed it: The users route is now just /users/...
+**2.Membership also has this issue where its /membership/membership/.... I would suggest simplifying it.**
+Changed to /membership/... to simplify.
+**3.The bookings route has a couple issues where you can just make a POST /bookings/class_id instead of POST /bookings/{class_id}/book. Additionally, the GET/bookings/{username}/bookings can be condensed into something like GET /bookings/{username}.**
+We decided to keep the POST /bookings/{class_id}/book endpoint because we added new endpoints like GET /bookings/{class_id}/waitlist. We also changed the GET /bookings/{username}/bookings endpoint to GET /bookings/{username} for simplicity, as it doesn't conflict with the other /bookings endpoints.
+**4.For POST /bookings/{class_id}/book, I would suggest having the endpoint use a JSON body to input the class_id and username instead of queries. I believe for best REST API practices you want to reserve queries for GET requests(filtering, sorting, etc) and JSON bodies for the others. You can do this by just making another Pydantic class and having the function take in that class as input.**
+The endpoint now accepts class_id and username in a JSON body using a Pydantic model instead of passing them in the path or query. This follows REST best practices by keeping the URL simple and using the request body for data input.
+**5.The checkins route also has a similar issue where I believe it could be shortened into POST /checkins/{user_id} and GET /checkins/{user_id}.**
+We kept POST /checkins/{user_id}/checkin for when a user checks in, but changed the GET to /checkins/{user_id} because it’s simpler and easier for users to understand.
+**6.Rooms route also has similar issue. Instead, have GET /rooms and GET /rooms/:number.**
+fixed
+**7.membership.cost should always be positive.**
+cost: PositiveInt = Field(..., gt=0, description="Cost of the membership plan in dollars")
+
+**8.There should be a foreign key relation between bookings.class_id and classes.class_id.**
+We already have th relationship: 
+	sa.Column("class_id", sa.Integer, sa.ForeignKey("classes.class_id"), nullable=False),
+**9.Consider making endpoints to unenroll from a booking and remove a class**
+We added those in the v4:
+@router.delete("/{class_id}/cancel", response_model=CancelResponse)
+def cancel_booking(class_id: int, username: str):
+
+**10.I think a majority GET endpoints for the /classes/... route can be condensed down into one singular function where you add optional queries. that way you use less endpoints and have a more concise endpoint that does everything.**
+We moved everything in one search endpoint in v4:
+@router.get("/search", response_model=List[Class], tags=["classes"])
+def search_classes(
+   class_name: str = "",
+   class_type: str = "",
+   instructor: str = "",
+   day: Optional[date] = None,
+   start_time: Optional[time] = None,
+   end_time: Optional[time] = None,
+):
+
+**11.Add start/end dates for memberships?**
+We didn’t add start/end dates because the membership becomes active from the user’s first checkin_date which we already have in the db. All memberships last one month, we can calculate the period based on that first check-in if needed, without needing extra fields.
+
+**12.Consider adding alembic CheckConstraints for things like cost or class capacity.**
+We added constraints for fields like cost and class capacity in v4.
 
 ## Feedback 4: Shane
 
