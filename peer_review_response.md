@@ -108,22 +108,29 @@ Added the following validations:
 ### API/Schema
 **1. The users route has two endpoints with POST /users/register and GET /users/{username}. I believe it's ideal to reduce the complexity and length of endpoints as much as possible without sacrificing readability and functionality so I would just having /users/...**
 We fixed it: The users route is now just /users/...
+
 **2.Membership also has this issue where its /membership/membership/.... I would suggest simplifying it.**
 Changed to /membership/... to simplify.
+
 **3.The bookings route has a couple issues where you can just make a POST /bookings/class_id instead of POST /bookings/{class_id}/book. Additionally, the GET/bookings/{username}/bookings can be condensed into something like GET /bookings/{username}.**
 We decided to keep the POST /bookings/{class_id}/book endpoint because we added new endpoints like GET /bookings/{class_id}/waitlist. We also changed the GET /bookings/{username}/bookings endpoint to GET /bookings/{username} for simplicity, as it doesn't conflict with the other /bookings endpoints.
+
 **4.For POST /bookings/{class_id}/book, I would suggest having the endpoint use a JSON body to input the class_id and username instead of queries. I believe for best REST API practices you want to reserve queries for GET requests(filtering, sorting, etc) and JSON bodies for the others. You can do this by just making another Pydantic class and having the function take in that class as input.**
 The endpoint now accepts class_id and username in a JSON body using a Pydantic model instead of passing them in the path or query. This follows REST best practices by keeping the URL simple and using the request body for data input.
+
 **5.The checkins route also has a similar issue where I believe it could be shortened into POST /checkins/{user_id} and GET /checkins/{user_id}.**
 We kept POST /checkins/{user_id}/checkin for when a user checks in, but changed the GET to /checkins/{user_id} because it’s simpler and easier for users to understand.
+
 **6.Rooms route also has similar issue. Instead, have GET /rooms and GET /rooms/:number.**
 fixed
+
 **7.membership.cost should always be positive.**
 cost: PositiveInt = Field(..., gt=0, description="Cost of the membership plan in dollars")
 
 **8.There should be a foreign key relation between bookings.class_id and classes.class_id.**
 We already have th relationship: 
 	sa.Column("class_id", sa.Integer, sa.ForeignKey("classes.class_id"), nullable=False),
+
 **9.Consider making endpoints to unenroll from a booking and remove a class**
 We added those in the v4:
 @router.delete("/{class_id}/cancel", response_model=CancelResponse)
