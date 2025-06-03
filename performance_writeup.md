@@ -1,5 +1,7 @@
 ## Fake Data Modeling
 
+file: https://github.com/dhvani427/gym-membership/blob/main/src/api/generate_sample_data.py
+
 **Users (50,000):**  
 A good approximation for a growing gym brand with several branches.
 
@@ -20,6 +22,13 @@ Users book many classes, creating high volume in the system.
 
 **History (600,000):**  
 Not all gym visits are for a class - this includes general workout sessions, which are estimated to be twice as frequent as class bookings.
+
+We chose to split the sample data like that to mimic how an actual gym will scale. As people grow interested, they will need different membership options with different combinations of class limits, special VIP rooms, assuming 5 options for class limits, 5 for different VIP room access, and 2 options for visit once a day or unlimited (5 * 5 * 2 = 50), and so on.
+For classes (1,900), we chose the number based on different class types and schedules. There are about 50 different types of classes like yoga, spin, and pilates. Each class has 5 levels of difficulty to fit different skill levels. For each class type and difficulty, there are 5 to 6 different instructors who can teach the class. Also, each class usually has a morning and an afternoon session. Multiply all these options together, it makes about 2000 classes in total. 
+For rooms, we chose 50 so there is an average of 5–6 classes in every room per day (assuming classes are scheduled each week), which seems reasonable given that class durations range from about 30 minutes to 2 hours.
+We set the waitlist to 10,000 because, on average, each class has about 10 people on the waitlist. This reflects popular classes where demand is higher than available spots.
+There are 338,000 bookings because users often book multiple classes per week. On average, people who attend classes regularly book about 5 classes a week. Some of these bookings are also canceled because people’s schedules tend to change. This creates a high volume of bookings.
+History has 600,000 records because not all gym checkins are for classes. Many people work out on their own, so the number of visits is roughly twice the number of class bookings.
 
 ---
 
