@@ -69,6 +69,4 @@ def downgrade() -> None:
     conn.execute(text("""
         UPDATE classes
         SET day = TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'),
-            start_time = TO_CHAR(CURRENT_TIME::time, 'HH24:MI:SS'),
-            end_time = TO_CHAR(CURRENT_TIME::time, 'HH24:MI:SS')
-    """))
+            start_time = TO_CHAR(CURRENT_TIME::

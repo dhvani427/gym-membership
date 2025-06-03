@@ -33,7 +33,7 @@ def post_class(gym_class: Class):
     """
     Posting a class
     """
-    start_time = time.time()
+    endpoint_start_time = time.time()
 
     with db.engine.begin() as connection:
         result = connection.execute(
@@ -132,7 +132,7 @@ def post_class(gym_class: Class):
             }
         )
         end_time = time.time()
-        elapsed_time = end_time - start_time
+        elapsed_time = end_time - endpoint_start_time
         print(f"Elapsed time: {elapsed_time} seconds")
 
 @router.get("/search", response_model=List[Class], tags=["classes"])
@@ -147,7 +147,7 @@ def search_classes(
     """
     Search for classes using optional filters.
     """
-    start_time = time.time()
+    endpoint_start_time = time.time()
     parameters = {}
     query = """
         SELECT * FROM classes WHERE 1=1
@@ -184,7 +184,7 @@ def search_classes(
         raise HTTPException(status_code=404, detail="No classes found")
 
     end_time = time.time()
-    elapsed_time = end_time - start_time
+    elapsed_time = end_time - endpoint_start_time
     print(f"Elapsed time: {elapsed_time} seconds")
 
     return [
