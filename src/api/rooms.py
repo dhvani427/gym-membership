@@ -4,8 +4,9 @@ from typing import List
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date, time
+import datetime
 
+import time
 
 router = APIRouter(
     prefix="/rooms",
@@ -20,12 +21,12 @@ class RoomDescription(BaseModel):
     type: str
 
 class TimeSlot(BaseModel):
-    start: time
-    end: time
+    start: datetime.time
+    end: datetime.time
 
 class RoomAvailability(BaseModel):
     number: int
-    day: date
+    day: datetime.date
     availability_slots: List[TimeSlot]
 
 
@@ -35,6 +36,7 @@ def get_rooms():
     """
     Get all rooms
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
@@ -43,6 +45,10 @@ def get_rooms():
                 """
             )
         ).all()
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
     return [
         RoomDescription(
@@ -58,6 +64,7 @@ def get_rooms_number(number: int):
     """
     Get room details by its number
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         row = connection.execute(
             sqlalchemy.text(
@@ -68,7 +75,10 @@ def get_rooms_number(number: int):
                 """
             ),{"number": number}
         ).first()
-    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
     if not row:
         raise HTTPException(status_code=404, detail="Room not found")
 
@@ -79,10 +89,11 @@ def get_rooms_number(number: int):
         )
 
 @router.get("/{day}", response_model=List[RoomAvailability])
-def get_available_rooms(day: date):
+def get_available_rooms(day: datetime.date):
     """
     Get all available rooms
     """
+    start_time = time.time()
     result = []
     start = time(8,0)
     end = time(18,0)
@@ -125,5 +136,7 @@ def get_available_rooms(day: date):
 
 
             result.append(RoomAvailability(number = room, day = day, availability_slots = available_slots))
-        
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
     return result

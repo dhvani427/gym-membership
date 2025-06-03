@@ -5,6 +5,8 @@ import sqlalchemy
 from src.api import auth
 from src import database as db
 
+import time
+
 router = APIRouter(
     prefix="/membership",
     tags=["membership"],
@@ -21,6 +23,7 @@ def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
     """
     Create new membership plan
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # check for duplicate plan name
         result = connection.execute(
@@ -53,6 +56,9 @@ def enroll_in_plan(username: str, membershipPlan: MembershipPlan):
                     "max_classes": membershipPlan.max_classes
                 }
             )
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
 
 class EnrollRequest(BaseModel):
     membership_id: int
@@ -65,6 +71,7 @@ def enroll_in_plan(user_id: str, data: EnrollRequest):
     """
     Enroll a user in a membership plan by username
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         # fetch the user by username
         user = connection.execute(
@@ -109,6 +116,11 @@ def enroll_in_plan(user_id: str, data: EnrollRequest):
             ),
             {"user_id": user_id, "membership_id": data.membership_id}
         )
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
     return EnrollResponse(message="User successfully enrolled in membership plan.")
 
 class MembershipResponse(BaseModel):
@@ -122,6 +134,7 @@ def get_membership_plans():
     """
     Get all membership plans
     """
+    start_time = time.time()
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
@@ -130,6 +143,10 @@ def get_membership_plans():
                 """
             )
         ).all()
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time: {elapsed_time} seconds")
 
     return [
         MembershipResponse(

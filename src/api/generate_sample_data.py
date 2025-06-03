@@ -5,14 +5,14 @@ from typing import List, Optional
 import sqlalchemy
 from src.api import auth
 from src import database as db
-from datetime import date, time
 from src.database import engine
 
 import os
 import dotenv
 from faker import Faker
 import numpy as np
-from datetime import datetime, timedelta, time
+import datetime
+import time
 
 router = APIRouter(
     prefix="/sample_data",
@@ -26,14 +26,15 @@ def random_time(start_hour=6, end_hour=22):
     # Random time between start_hour and end_hour
     hour = np.random.randint(start_hour, end_hour)
     minute = np.random.choice([0, 15, 30, 45])
-    return time(hour, minute)
+    return datetime.time(hour, minute)
 
 def random_date(start_days_ago=365):
     # Random date within the last year
-    return datetime.now().date() - timedelta(days=np.random.randint(0, start_days_ago))
+    return datetime.datetime.now().date() - datetime.timedelta(days=np.random.randint(0, start_days_ago))
 
 @router.post("", status_code=status.HTTP_204_NO_CONTENT)
 def generate_sample_data():
+    start_time = time.time()
     with engine.begin() as conn:
         conn.execute(sqlalchemy.text("""
         DROP TABLE IF EXISTS bookings;
@@ -164,7 +165,7 @@ def generate_sample_data():
             start = random_time()
             # classes last between 30 mins to 1.5 hours
             duration_minutes = np.random.choice([30, 45, 60, 75, 90])
-            end_dt = (datetime.combine(datetime.today(), start) + timedelta(minutes=int(duration_minutes))).time()
+            end_dt = (datetime.datetime.combine(datetime.datetime.today(), start) + datetime.timedelta(minutes=int(duration_minutes))).time()
 
             classes.append({
                 "class_name": fake.word().title() + " Class",
@@ -240,3 +241,7 @@ def generate_sample_data():
             print(f"Inserted bookings: {batch_start + batch_size}")
 
         print("Data population complete!")
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"Elapsed time: {elapsed_time} seconds")
