@@ -20,7 +20,7 @@ def checkin_user(user_id: int):
     Check in a user by inserting a row into the history table.
     """
     start_time = time.time()
-    now = datetime.now()
+    now = datetime.datetime.now()
 
     with db.engine.begin() as connection:
         # check if user exists
