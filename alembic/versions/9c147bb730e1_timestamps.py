@@ -22,11 +22,22 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade():
-    # Change column types
-    op.alter_column("history", "check_in_date", type_=sa.Date(), existing_type=sa.String)
-    op.alter_column("history", "check_in_time", type_=sa.Time(), existing_type=sa.String)
-
-    # Set existing values to current date and time
+    # Change column types with USING to avoid cast errors
+    op.alter_column(
+        "history",
+        "check_in_date",
+        type_=sa.Date(),
+        existing_type=sa.String,
+        postgresql_using="check_in_date::date"
+    )
+    op.alter_column(
+        "history",
+        "check_in_time",
+        type_=sa.Time(),
+        existing_type=sa.String,
+        postgresql_using="check_in_time::time"
+    )
+    # Then your UPDATE statement if needed
     conn = op.get_bind()
     conn.execute(text("""
         UPDATE history
@@ -34,18 +45,35 @@ def upgrade():
             check_in_time = CURRENT_TIME::time
     """))
 
-    op.alter_column("classes", "day", type_=sa.Date(), existing_type=sa.String)
-    op.alter_column("classes", "start_time", type_=sa.Time(), existing_type=sa.String)
-    op.alter_column("classes", "end_time", type_=sa.Time(), existing_type=sa.String)
-
-    # Update all values to current date and time
-    conn = op.get_bind()
+    op.alter_column(
+        "classes",
+        "day",
+        type_=sa.Date(),
+        existing_type=sa.String,
+        postgresql_using="day::date"
+    )
+    op.alter_column(
+        "classes",
+        "start_time",
+        type_=sa.Time(),
+        existing_type=sa.String,
+        postgresql_using="start_time::time"
+    )
+    op.alter_column(
+        "classes",
+        "end_time",
+        type_=sa.Time(),
+        existing_type=sa.String,
+        postgresql_using="end_time::time"
+    )
+    # Your UPDATE for classes
     conn.execute(text("""
         UPDATE classes
         SET day = CURRENT_DATE,
             start_time = CURRENT_TIME::time,
             end_time = CURRENT_TIME::time
     """))
+
 
 
 def downgrade() -> None:
