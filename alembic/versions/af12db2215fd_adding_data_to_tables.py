@@ -42,7 +42,7 @@ def upgrade() -> None:
     """)
 
     op.execute("""
-        INSERT INTO users (username, first_name, last_name, email, date_of_birth, password, membership_plan) VALUES
+        INSERT INTO users (username, first_name, last_name, email, date_of_birth, password, membership) VALUES
         ('alice1', 'Alice', 'Smith', 'alice@example.com', '2000-01-01', 'pw123', 1),
         ('bob22', 'Bob', 'Jones', 'bob@example.com', '1999-05-10', 'pw123', 2),
         ('charlie3', 'Charlie', 'Kim', 'charlie@example.com', '2001-07-15', 'pw123', 2),
