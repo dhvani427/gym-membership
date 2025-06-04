@@ -121,7 +121,7 @@ def book_class(user_id: int, class_id: int):
 
 class CancelResponse(BaseModel):
     class_id: int
-    cancellation_status: str
+    cancellation_status: str= "Booking cancelled successfully"
     enrolled_from_waitlist: Optional[str] = None 
 
 @router.delete("/{class_id}/cancel", response_model=CancelResponse)

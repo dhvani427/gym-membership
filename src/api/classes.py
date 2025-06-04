@@ -28,8 +28,11 @@ class Class(BaseModel):
     instructor: str
     room_number: int
 
+class ClassCreateResponse(BaseModel):
+    message: str = Field(..., example="Class created successfully")
+    class_id: int
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ClassCreateResponse)
 def post_class(gym_class: Class):
     """
     Posting a class
@@ -150,7 +153,6 @@ def post_class(gym_class: Class):
                 detail="Room already booked during the selected time slot"
             )
 
-        
         # Check for instructor conflict
         instructor_conflict = connection.execute(
             sqlalchemy.text(
@@ -215,10 +217,8 @@ def post_class(gym_class: Class):
         elapsed_time = end_time - endpoint_start_time
         print(f"Elapsed time: {elapsed_time} seconds")
         
-        return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
-        content={"message": "Class created successfully", "class_id": class_id}
-    )
+        return ClassCreateResponse(message="Class created successfully", class_id=class_id)
+
 
 @router.get("/search", response_model=List[Class], tags=["classes"])
 def search_classes(
