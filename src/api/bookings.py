@@ -6,6 +6,7 @@ from src.api import auth
 from src import database as db
 import datetime
 from typing import Optional
+from typing import List
 
 import time
 
@@ -17,38 +18,34 @@ router = APIRouter(
 
 class BookingRequest(BaseModel):
     class_id: int
-    username: str
+    user_id: int
 
 class BookingResponse(BaseModel):
     class_id: int
-    enrollment_status: str = Field(
-        default="Booking successful")
+    enrollment_status: str = "Booking successful"
 
 @router.post("/book", response_model=BookingResponse)
-def book_class(booking: BookingRequest):
+def book_class(user_id: int, class_id: int):
     start_time = time.time()
-    class_id = booking.class_id
-    username = booking.username
     """
     Book a class for a user
     """
-
     with db.engine.begin() as connection:
         # check if the user exists
         user = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT user_id FROM users 
-                WHERE username = :username
+                SELECT username FROM users
+                WHERE user_id = :user_id
                 """
                 ),
-            {"username": username}
+            {"user_id": user_id}
         ).first()
 
         if user is None:
             raise HTTPException(status_code=422, detail="User not found")
 
-        user_id = user.user_id
+        username = user.username
 
         # check if class exists and get capacity
         gym_class = connection.execute(
@@ -78,9 +75,9 @@ def book_class(booking: BookingRequest):
         if existing_booking:
             raise HTTPException(status_code=400, detail="User already booked this class")
 
-        
         # check if class is full
         class_capacity = gym_class.capacity
+
         booked_count = connection.execute(
             sqlalchemy.text(
                 """
@@ -91,24 +88,28 @@ def book_class(booking: BookingRequest):
             {"class_id": class_id}
         ).scalar()
 
-        # check if class is full
+        print(f"Booked count for class {class_id}: {booked_count}, Class capacity: {class_capacity}")
         if booked_count >= class_capacity:
+            print(class_id)
             return BookingResponse(
                 class_id=class_id,
                 enrollment_status="Class is full, please join the waitlist or choose another class"
             )
 
         # insert booking
-        connection.execute(
+        id = connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO bookings (user_id, class_id)
                 VALUES (:user_id, :class_id)
+                RETURNING booking_id
                 """
                 ),
             {"user_id": user_id, "class_id": class_id}
-        )
+        ).fetchone()
 
+        booking_id = id.booking_id
+        print(f"Booking ID: {booking_id}")
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"Elapsed time: {elapsed_time} seconds")
@@ -124,22 +125,34 @@ class CancelResponse(BaseModel):
     enrolled_from_waitlist: Optional[str] = None 
 
 @router.delete("/{class_id}/cancel", response_model=CancelResponse)
-def cancel_booking(class_id: int, username: str):
+def cancel_booking(class_id: int, user_id: int):
     """
-    Cancel a class booking for a user, and enroll first waitlist user
+    Cancel a class booking for a user, and enroll first waitlisted user
     """
     start_time = time.time()
     with db.engine.begin() as connection:
         # Check if user exists
         user = connection.execute(
-            sqlalchemy.text("SELECT user_id FROM users WHERE username = :username"),
-            {"username": username}
+            sqlalchemy.text("SELECT username FROM users WHERE user_id = :user_id"),
+            {"user_id": user_id}
         ).first()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
+        
+        # check if class exists
+        gym_class = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 FROM classes 
+                WHERE class_id = :class_id
+                """
+                ),
+            {"class_id": class_id}
+        ).first()
 
-        user_id = user.user_id
+        if gym_class is None:
+            raise HTTPException(status_code=422, detail="Class not found")
 
         # check if booking exists
         booking = connection.execute(
@@ -160,7 +173,7 @@ def cancel_booking(class_id: int, username: str):
             {"user_id": user_id, "class_id": class_id}
         )
 
-        # check if there are users on the waitlist has for this class, get the user with lowest position
+        # check if there are users on the waitlist for this class, get the user with lowest position
         next_waitlist = connection.execute(
             sqlalchemy.text(
                 """
@@ -168,7 +181,7 @@ def cancel_booking(class_id: int, username: str):
                 FROM waitlist w
                 JOIN users u ON w.user_id = u.user_id
                 WHERE w.class_id = :class_id
-                ORDER BY w.waitlist_position
+                ORDER BY w.waitlist_position ASC
                 LIMIT 1
                 """
             ),
@@ -217,7 +230,16 @@ def cancel_booking(class_id: int, username: str):
         enrolled_from_waitlist=next_user_username if next_waitlist else None,
     )
 
-@router.get("/{class_id}/waitlist")
+class WaitlistEntry(BaseModel):
+    username: str
+    user_id: int
+    waitlist_position: int
+
+class WaitlistResponse(BaseModel):
+    class_id: int
+    waitlist: List[WaitlistEntry]
+
+@router.get("/{class_id}/waitlist", response_model=WaitlistResponse)
 def get_waitlist(class_id: int):
     """
     Get all users on the waitlist for a class
@@ -242,31 +264,36 @@ def get_waitlist(class_id: int):
         result = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT u.username, w.waitlist_position
+                SELECT u.username, u.user_id, w.waitlist_position
                 FROM waitlist w
                 JOIN users u ON w.user_id = u.user_id
                 WHERE w.class_id = :class_id
-                ORDER BY w.waitlist_position
+                ORDER BY w.waitlist_position ASC
                 """
             ),
             {"class_id": class_id}
-        )
+        ).fetchall()
 
-        waitlist = [{"username": row.username, "waitlist_position": row.waitlist_position} for row in result]
+        waitlist_entries = [
+            WaitlistEntry(
+                username=row.username,
+                user_id=row.user_id,
+                waitlist_position=row.waitlist_position
+            )
+            for row in result
+        ]
 
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time} seconds")
+    print(f"Elapsed time: {time.time() - start_time} seconds")
 
-    return {"class_id": class_id, "waitlist": waitlist}
+    return WaitlistResponse(class_id=class_id, waitlist=waitlist_entries)
 
 class JoinWaitlistResponse(BaseModel):
-    username: str
+    user_id: int
     class_id: int
     waitlist_position: int
 
-@router.post("/{class_id}/waitlist/join")
-def join_waitlist(class_id: int, username: str):
+@router.post("/{class_id}/waitlist/join", response_model=JoinWaitlistResponse)
+def join_waitlist(class_id: int, user_id: int):
     """
     Join the waitlist for a class
     """
@@ -276,17 +303,15 @@ def join_waitlist(class_id: int, username: str):
         user = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT user_id FROM users 
-                WHERE username = :username
+                SELECT username FROM users 
+                WHERE user_id = :user_id
                 """
                 ),
-            {"username": username}
+            {"user_id": user_id}
         ).first()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-
-        user_id = user.user_id
 
         # check if class exists
         gym_class = connection.execute(
@@ -328,7 +353,7 @@ def join_waitlist(class_id: int, username: str):
         ).first()
 
         if existing_waitlist:
-            raise HTTPException(status_code=400, detail="User already on the waitlist")
+            raise HTTPException(status_code=422, detail="User already on the waitlist")
 
         # get current waitlist position
         current_position = connection.execute(
@@ -340,6 +365,7 @@ def join_waitlist(class_id: int, username: str):
                 ),
             {"class_id": class_id}
         ).scalar()
+
         # insert user into waitlist
         connection.execute(
             sqlalchemy.text(
@@ -359,13 +385,26 @@ def join_waitlist(class_id: int, username: str):
     print(f"Elapsed time: {elapsed_time} seconds")
 
     return JoinWaitlistResponse(
-        username=username,
+        user_id=user_id,
         class_id=class_id,
         waitlist_position=current_position + 1 if current_position else 1
     )
 
-@router.get("/{username}")
-def get_bookings(username: str):
+class Booking(BaseModel):
+    class_id: int
+    class_name: str
+    day: str
+    start_time: datetime.time
+    end_time: datetime.time
+    instructor: str
+    room_number: int
+
+class BookingResponseHistory(BaseModel):
+    username: str
+    bookings: List[Booking]
+
+@router.get("/{user_id}", response_model=BookingResponseHistory)
+def get_bookings(user_id: int):
     """
     Get all class bookings for a user
     """
@@ -375,16 +414,16 @@ def get_bookings(username: str):
         user = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT user_id FROM users WHERE username = :username
+                SELECT username FROM users WHERE user_id = :user_id
                 """
                 ),
-            {"username": username}
+            {"user_id": user_id}
         ).first()
 
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-
-        user_id = user.user_id
+        
+        username = user.username
 
         # get all bookings
         result = connection.execute(
@@ -397,21 +436,23 @@ def get_bookings(username: str):
                 """
             ),
             {"user_id": user_id}
-        )
+        ).fetchall()
 
-        if not result:
-            raise HTTPException(status_code=404, detail="No bookings found for this user.")
+        bookings = [
+            Booking(
+                class_id=row.class_id,
+                class_name=row.class_name,
+                day=str(row.day),
+                start_time=row.start_time,
+                end_time=row.end_time,
+                instructor=row.instructor,
+                room_number=row.room_number
+            )
+            for row in result
+        ]
 
-        bookings = [{"class_id": row.class_id,
-            "class_name": row.class_name,
-            "day": str(row.day),
-            "start_time": row.start_time,
-            "end_time": row.end_time,
-            "instructor": row.instructor,
-            "room_number": row.room_number
-            } for row in result]
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time: {elapsed_time} seconds")
 
-    return {"username": username, "bookings": bookings}
+    return BookingResponseHistory(username=username, user_id=user_id, bookings=bookings)
