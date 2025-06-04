@@ -5,8 +5,7 @@ import sqlalchemy
 from src.api import auth
 from src import database as db
 from datetime import date
-
-import time
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/users",
@@ -22,47 +21,54 @@ class User(BaseModel):
     last_name: str
     email: str
 
-
-@router.post("/register", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user: User):
     """
-    Registering a user to the gym
+    Register a new user. Check for duplicate username or email first. Return user_id on success.
     """
-    start_time = time.time()
     username = f"{user.username}"
 
-    # check if the user already exists
     with db.engine.begin() as connection:
+        # Check for existing username
         existing = connection.execute(
-            sqlalchemy.text(
-                "SELECT 1 FROM users WHERE username = :username"
-            ),
-            {"username": username}
+            sqlalchemy.text("SELECT 1 FROM users WHERE username = :username"),
+            {"username": user.username}
         ).first()
 
         if existing:
-            raise HTTPException(status_code=409, detail="User already exists")
+            raise HTTPException(status_code=400, detail="Username already exists")
 
-        # insert the new user if not already present
-        connection.execute(
+        # Check for existing email
+        existing_email = connection.execute(
+        sqlalchemy.text("SELECT 1 FROM users WHERE email = :email"),
+        {"email": user.email}
+        ).first()
+
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Register a new user
+    with db.engine.begin() as connection:
+        id = connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO users (username, password, date_of_birth, first_name, last_name, email)
                 VALUES (:username, :password, :date_of_birth, :first_name, :last_name, :email)
+                RETURNING user_id
                 """
             ),{
-                "username": f"{user.username}",
-                "password": f"{user.password}",
-                "date_of_birth": f"{user.date_of_birth}",
-                "first_name": f"{user.first_name}",
-                "last_name": f"{user.last_name}",
-                "email": f"{user.email}",
-
+                "username": user.username,
+                "password": user.password,
+                "date_of_birth": user.date_of_birth,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
             }
         )
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time} seconds")
+        user_id = id.scalar()
+
+    return JSONResponse(status_code=201, content={"message": "User registered successfully", "user_id": user_id})
+
 
 class UserResponse(BaseModel):
     username: str
@@ -71,38 +77,34 @@ class UserResponse(BaseModel):
     last_name: str
     email: str
 
-
-@router.get("/{username}", response_model=UserResponse)
-def get_user_info(username:str):
+@router.get("/{user_id}", response_model=UserResponse)
+def get_user_info(user_id:str):
     """
     Get user details
     """
-    start_time = time.time()
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
                 """
                 SELECT * FROM users 
-                WHERE username = :username
+                WHERE user_id = :user_id
                 """
             ),{
-                "username": f"{username}",
+                "user_id": f"{user_id}",
 
             }
         )
         user = result.fetchone()
+        print(user)
 
+    # Check if user exists
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time} seconds")
-
+    
     return UserResponse(
-        username=user.username,
-        date_of_birth=user.date_of_birth,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        email=user.email
+        username=user[1],
+        date_of_birth=user[5],
+        first_name=user[2],
+        last_name=user[3],
+        email=user[4]
     )

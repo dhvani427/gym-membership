@@ -76,12 +76,24 @@ def post_class(gym_class: Class):
                 detail="Class must be scheduled between 6:00 AM and 6:00 PM"
             )
         
-        # Don't allow booking classes in the past
-        #if gym_class.day < datetime.date.today():
-        #    raise HTTPException(
-        #       status_code=400,
-    #        detail="Cannot schedule a class in the past"
-         #   )
+        #check if the duration of the class exceeds 2 hours
+        start_dt = datetime.datetime.combine(gym_class.day, gym_class.start_time)
+        end_dt = datetime.datetime.combine(gym_class.day, gym_class.end_time)
+        duration = (end_dt - start_dt).total_seconds() / 3600
+        if duration > 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Class duration cannot exceed 2 hours"
+            )
+        
+        # Check if trying to schedule class in the past
+        now = datetime.datetime.now()
+        class_datetime = datetime.datetime.combine(gym_class.day, gym_class.start_time)
+        if class_datetime < now:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot schedule a class in the past"
+            )
         
         # Check for duplicate class
         duplicate = connection.execute(
@@ -115,6 +127,13 @@ def post_class(gym_class: Class):
                 SELECT 1 FROM classes
                 WHERE room_number = :room_number
                 AND day = :day
+                AND (
+                    (start_time < :start_time AND end_time > :start_time)
+                    OR
+                    (start_time >= :start_time AND start_time < :end_time)
+                    OR
+                    (start_time <= :start_time AND end_time >= :end_time)
+                )
                 """
             ),
             {
@@ -130,6 +149,7 @@ def post_class(gym_class: Class):
                 status_code=409,
                 detail="Room already booked during the selected time slot"
             )
+
         
         # Check for instructor conflict
         instructor_conflict = connection.execute(
@@ -138,7 +158,13 @@ def post_class(gym_class: Class):
                 SELECT 1 FROM classes
                 WHERE instructor = :instructor
                 AND day = :day
-                AND (start_time < :end_time AND end_time > :start_time)
+                AND (
+                    (start_time < :start_time AND end_time > :start_time)
+                    OR
+                    (start_time >= :start_time AND start_time < :end_time)
+                    OR
+                    (start_time <= :start_time AND end_time >= :end_time)
+                )
                 """
             ),
             {
@@ -156,7 +182,7 @@ def post_class(gym_class: Class):
             )
 
         # Proceed to insert the class
-        connection.execute(
+        class_id = connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO classes (
@@ -167,6 +193,7 @@ def post_class(gym_class: Class):
                     :class_name, :class_type, :description, :day, :capacity,
                     :start_time, :end_time, :instructor, :room_number
                 )
+                RETURNING class_id
                 """
             ),
             {
@@ -181,13 +208,16 @@ def post_class(gym_class: Class):
                 "room_number": gym_class.room_number,
             }
         )
+        # Get the class_id of the newly created class
+        class_id = class_id.scalar()
+
         end_time = time.time()
         elapsed_time = end_time - endpoint_start_time
         print(f"Elapsed time: {elapsed_time} seconds")
         
         return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content={"message": "Class created successfully"}
+        content={"message": "Class created successfully", "class_id": class_id}
     )
 
 @router.get("/search", response_model=List[Class], tags=["classes"])
