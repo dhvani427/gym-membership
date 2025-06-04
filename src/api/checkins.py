@@ -21,7 +21,7 @@ def checkin_user(user_id: int):
     """
     #this is calculating time for V5
     start_time = time.time()
-    now = datetime.now()
+    now = datetime.datetime.now()
 
     with db.engine.begin() as connection:
         # check if user exists, if it does grab user from user table, using user_id to identify user
