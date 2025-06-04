@@ -18,6 +18,7 @@ router = APIRouter(
 )
 
 class Class(BaseModel):
+    class_id: int
     class_name: str
     class_type: str
     description: str
@@ -279,6 +280,7 @@ def search_classes(
 
     return [
         Class(
+            class_id = row.class_id,
             class_name=row.class_name,
             class_type=row.class_type,
             description=row.description,
