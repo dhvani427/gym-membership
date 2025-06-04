@@ -29,6 +29,40 @@ class RoomAvailability(BaseModel):
     day: datetime.date
     availability_slots: List[TimeSlot]
 
+@router.post("", status_code=status.HTTP_201_CREATED)
+def create_room(room: RoomDescription):
+    """
+    Create a new room
+    """
+    with db.engine.begin() as connection:
+        existing = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 FROM rooms 
+                WHERE room_number = :number
+                """
+                ),
+            {"number": room.number}
+        ).first()
+
+        if existing:
+            raise HTTPException(status_code=400, detail="Room with this number already exists")
+
+        connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO rooms (room_number, capacity, type)
+                VALUES (:number, :capacity, :type)
+                """
+                ),
+            {
+                "number": room.number,
+                "capacity": room.capacity,
+                "type": room.type,
+            }
+        )
+
+    return {"message": "Room created successfully"}
 
 
 @router.get("", response_model=List[RoomDescription])
