@@ -29,12 +29,23 @@ class Class(BaseModel):
     instructor: str
     room_number: int
 
+class PostClass(BaseModel):
+    class_name: str
+    class_type: str
+    description: str
+    day: datetime.date
+    capacity: int
+    start_time: datetime.time = Field(..., example="18:00")
+    end_time: datetime.time = Field(..., example="19:00")
+    instructor: str
+    room_number: int
+
 class ClassCreateResponse(BaseModel):
     message: str = Field(..., example="Class created successfully")
     class_id: int
 
 @router.post("/", response_model=ClassCreateResponse)
-def post_class(gym_class: Class):
+def post_class(gym_class: PostClass):
     """
     Posting a class
     """
