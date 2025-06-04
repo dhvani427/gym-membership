@@ -38,7 +38,7 @@ def upgrade() -> None:
         ( 7, 5, 'Stretch' ),
         ( 8, 5, 'Yoga' ),
         ( 9, 10, 'Cardio' ),
-        ( 10, 30, 'Weight' ),
+        ( 10, 30, 'Weight' )
     """)
 
     op.execute("""
@@ -72,42 +72,48 @@ def upgrade() -> None:
     (13, 'Weight Training', 'Weight', 'Strength training session', '2025-06-17', 30, '10:00:00', '11:30:00', 'David Wilson', 3),
     (14, 'Pilates Basics', 'Pilates', 'Introduction to Pilates', '2025-06-18', 20, '11:00:00', '12:00:00', 'Anna Lee', 4),
     (15, 'Advanced Pilates', 'Pilates', 'Challenging Pilates routine', '2025-06-19', 30, '12:00:00', '13:00:00', 'Evan Davis', 5);
-""")
-    
-op.execute("""
-INSERT INTO bookings (class_id, user_id) VALUES
-(1, 1),
-(1, 2),
-(2, 3),
-(3, 4),
-(3, 5),
-(4, 6),
-(5, 7),
-(2, 7),
-(3, 7),
-(3, 7),
-(4, 7),
-(6, 8),
-(7, 9),
-(8, 10);
-
-""")
-
-op.execute("""
-        INSERT INTO history (check_in_date, check_in_time, user_id) VALUES
-        ('2025-06-01', '08:15:00', 1),
-        ('2025-06-01', '09:00:00', 2),
-        ('2025-06-02', '10:30:00', 3),
-        ('2025-06-02', '07:45:00', 4),
-        ('2025-06-03', '12:00:00', 5),
-        ('2025-06-03', '15:30:00', 6),
-        ('2025-06-03', '17:00:00', 7),
-        ('2025-06-03', '18:45:00', 8),
-        ('2025-06-02', '08:30:00', 9),
-        ('2025-06-01', '14:00:00', 10)
     """)
+    
+    op.execute("""
+    INSERT INTO bookings (class_id, user_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 3),
+    (3, 4),
+    (3, 5),
+    (4, 6),
+    (5, 7),
+    (2, 7),
+    (3, 7),
+    (3, 7),
+    (4, 7),
+    (6, 8),
+    (7, 9),
+    (8, 10);
+
+    """)
+
+    op.execute("""
+            INSERT INTO history (check_in_date, check_in_time, user_id) VALUES
+            ('2025-06-01', '08:15:00', 1),
+            ('2025-06-01', '09:00:00', 2),
+            ('2025-06-02', '10:30:00', 3),
+            ('2025-06-02', '07:45:00', 4),
+            ('2025-06-03', '12:00:00', 5),
+            ('2025-06-03', '15:30:00', 6),
+            ('2025-06-03', '17:00:00', 7),
+            ('2025-06-03', '18:45:00', 8),
+            ('2025-06-02', '08:30:00', 9),
+            ('2025-06-01', '14:00:00', 10)
+        """)
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.execute("""("DELETE FROM history")""")
+    op.execute("DELETE FROM history")
+    op.execute("DELETE FROM waitlist")
+    op.execute("DELETE FROM bookings")
+    op.execute("DELETE FROM classes")
+    op.execute("DELETE FROM users")
+    op.execute("DELETE FROM rooms")
+    op.execute("DELETE FROM membership")
