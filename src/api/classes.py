@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from fastapi.responses import JSONResponse
 
 
 import sqlalchemy
@@ -22,19 +23,20 @@ class Class(BaseModel):
     description: str
     day: datetime.date
     capacity: int
-    start_time: datetime.time
-    end_time: datetime.time
+    start_time: datetime.time = Field(..., example="18:00")
+    end_time: datetime.time = Field(..., example="19:00")
     instructor: str
     room_number: int
 
 
-@router.post("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def post_class(gym_class: Class):
     """
     Posting a class
     """
     endpoint_start_time = time.time()
 
+    # Check if the room exists
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
@@ -47,19 +49,66 @@ def post_class(gym_class: Class):
             raise HTTPException(status_code=404, detail="Room not found")
 
         room_capacity = result.capacity
+        # Check if class capacity is positive and does not exceed room capacity
+        if gym_class.capacity <= 0:
+            raise HTTPException(status_code=400, detail="Class capacity must be a positive number")
 
+        #if class capacity is more than room capacity
         if gym_class.capacity > room_capacity:
             raise HTTPException(
                 status_code=400,
                 detail=f"Class capacity {gym_class.capacity} exceeds room capacity {room_capacity}"
             )
         
+        # Check that start time is before end time
         if gym_class.start_time>gym_class.end_time:
             raise HTTPException(
                 status_code=400,
-                detail=f"Class start time is after the end time"
+                detail=f"Class start time must be before the end time"
             )
         
+        #Check if time is within gym hours (e.g., 6am - 10pm)
+        opening = datetime.time(6, 0)
+        closing = datetime.time(18, 0)
+        if not (opening <= gym_class.start_time <= closing and opening <= gym_class.end_time <= closing):
+            raise HTTPException(
+                status_code=400,
+                detail="Class must be scheduled between 6:00 AM and 6:00 PM"
+            )
+        
+        # Don't allow booking classes in the past
+        #if gym_class.day < datetime.date.today():
+        #    raise HTTPException(
+        #       status_code=400,
+    #        detail="Cannot schedule a class in the past"
+         #   )
+        
+        # Check for duplicate class
+        duplicate = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 1 FROM classes
+                WHERE class_name = :class_name AND day = :day
+                AND start_time = :start_time AND instructor = :instructor
+                AND room_number = :room_number
+                """
+            ),
+            {
+                "class_name": gym_class.class_name,
+                "day": gym_class.day,
+                "start_time": gym_class.start_time,
+                "instructor": gym_class.instructor,
+                "room_number": gym_class.room_number
+            }
+        ).first()
+
+        if duplicate:
+            raise HTTPException(
+                status_code=409,
+                detail="Duplicate class: this class has already been added"
+            )
+        
+        # Check for room conflict with time overlap
         conflict = connection.execute(
             sqlalchemy.text(
                 """
@@ -82,6 +131,7 @@ def post_class(gym_class: Class):
                 detail="Room already booked during the selected time slot"
             )
         
+        # Check for instructor conflict
         instructor_conflict = connection.execute(
             sqlalchemy.text(
                 """
@@ -134,6 +184,11 @@ def post_class(gym_class: Class):
         end_time = time.time()
         elapsed_time = end_time - endpoint_start_time
         print(f"Elapsed time: {elapsed_time} seconds")
+        
+        return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={"message": "Class created successfully"}
+    )
 
 @router.get("/search", response_model=List[Class], tags=["classes"])
 def search_classes(
@@ -148,6 +203,11 @@ def search_classes(
     Search for classes using optional filters.
     """
     endpoint_start_time = time.time()
+
+    # Check for invalid time range
+    if start_time and end_time and start_time > end_time:
+        raise HTTPException(status_code=400, detail="Start time must be before end time")
+    
     parameters = {}
     query = """
         SELECT * FROM classes WHERE 1=1
