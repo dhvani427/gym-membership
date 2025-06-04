@@ -56,22 +56,22 @@ def upgrade() -> None:
     """)
 
     op.execute("""
-    INSERT INTO classes (class_id, class_name, class_type, description, day, capacity, start_time, end_time, instructor, room_number) VALUES
-    (1, 'Morning Yoga', 'Yoga', 'Start your day with calming yoga', '2025-06-04', 15, '08:00:00', '09:00:00', 'John Smith', 1),
-    (2, 'Cardio Blast', 'Cardio', 'High-intensity cardio workout', '2025-06-05', 10, '09:00:00', '10:00:00', 'Jane Doe', 2),
-    (3, 'Weight Training', 'Weight', 'Strength training session', '2025-06-06', 30, '10:00:00', '11:30:00', 'David Wilson', 3),
-    (4, 'Pilates Basics', 'Pilates', 'Introduction to Pilates', '2025-06-07', 20, '11:00:00', '12:00:00', 'Anna Lee', 4),
-    (5, 'Advanced Pilates', 'Pilates', 'Challenging Pilates routine', '2025-06-08', 30, '12:00:00', '13:00:00', 'Evan Davis', 5),
-    (6, 'Weight Circuit', 'Weight', 'Circuit training with weights', '2025-06-09', 10, '13:00:00', '14:00:00', 'Sarah Miller', 6),
-    (7, 'Stretch & Relax', 'Stretch', 'Full body stretching', '2025-06-10', 5, '14:00:00', '14:45:00', 'Grace Hall', 7),
-    (8, 'Evening Yoga', 'Yoga', 'Relaxing yoga to end the day', '2025-06-11', 5, '18:00:00', '19:00:00', 'John Smith', 8),
-    (9, 'Cardio Kickboxing', 'Cardio', 'Kickboxing for cardio', '2025-06-12', 10, '17:00:00', '18:00:00', 'Tom Clark', 9),
-    (10, 'Power Weightlifting', 'Weight', 'Intense weightlifting', '2025-06-13', 30, '15:00:00', '16:30:00', 'Chris Johnson', 10),
-    (11, 'Morning Yoga', 'Yoga', 'Start your day with calming yoga', '2025-06-15', 15, '08:00:00', '09:00:00', 'John Smith', 1),
-    (12, 'Cardio Blast', 'Cardio', 'High-intensity cardio workout', '2025-06-16', 10, '09:00:00', '10:00:00', 'Jane Doe', 2),
-    (13, 'Weight Training', 'Weight', 'Strength training session', '2025-06-17', 30, '10:00:00', '11:30:00', 'David Wilson', 3),
-    (14, 'Pilates Basics', 'Pilates', 'Introduction to Pilates', '2025-06-18', 20, '11:00:00', '12:00:00', 'Anna Lee', 4),
-    (15, 'Advanced Pilates', 'Pilates', 'Challenging Pilates routine', '2025-06-19', 30, '12:00:00', '13:00:00', 'Evan Davis', 5);
+    INSERT INTO classes (class_name, class_type, description, day, capacity, start_time, end_time, instructor, room_number) VALUES
+    ('Morning Yoga', 'Yoga', 'Start your day with calming yoga', '2025-06-04', 15, '08:00:00', '09:00:00', 'John Smith', 1),
+    ('Cardio Blast', 'Cardio', 'High-intensity cardio workout', '2025-06-05', 10, '09:00:00', '10:00:00', 'Jane Doe', 2),
+    ('Weight Training', 'Weight', 'Strength training session', '2025-06-06', 30, '10:00:00', '11:30:00', 'David Wilson', 3),
+    ('Pilates Basics', 'Pilates', 'Introduction to Pilates', '2025-06-07', 20, '11:00:00', '12:00:00', 'Anna Lee', 4),
+    ('Advanced Pilates', 'Pilates', 'Challenging Pilates routine', '2025-06-08', 30, '12:00:00', '13:00:00', 'Evan Davis', 5),
+    ('Weight Circuit', 'Weight', 'Circuit training with weights', '2025-06-09', 10, '13:00:00', '14:00:00', 'Sarah Miller', 6),
+    ('Stretch & Relax', 'Stretch', 'Full body stretching', '2025-06-10', 5, '14:00:00', '14:45:00', 'Grace Hall', 7),
+    ('Evening Yoga', 'Yoga', 'Relaxing yoga to end the day', '2025-06-11', 5, '18:00:00', '19:00:00', 'John Smith', 8),
+    ('Cardio Kickboxing', 'Cardio', 'Kickboxing for cardio', '2025-06-12', 10, '17:00:00', '18:00:00', 'Tom Clark', 9),
+    ('Power Weightlifting', 'Weight', 'Intense weightlifting', '2025-06-13', 30, '15:00:00', '16:30:00', 'Chris Johnson', 10),
+    ('Morning Yoga', 'Yoga', 'Start your day with calming yoga', '2025-06-15', 15, '08:00:00', '09:00:00', 'John Smith', 1),
+    ('Cardio Blast', 'Cardio', 'High-intensity cardio workout', '2025-06-16', 10, '09:00:00', '10:00:00', 'Jane Doe', 2),
+    ( 'Weight Training', 'Weight', 'Strength training session', '2025-06-17', 30, '10:00:00', '11:30:00', 'David Wilson', 3),
+    ('Pilates Basics', 'Pilates', 'Introduction to Pilates', '2025-06-18', 20, '11:00:00', '12:00:00', 'Anna Lee', 4),
+    ('Advanced Pilates', 'Pilates', 'Challenging Pilates routine', '2025-06-19', 30, '12:00:00', '13:00:00', 'Evan Davis', 5);
     """)
     
     op.execute("""
